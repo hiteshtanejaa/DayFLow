@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/.env
+*.egg-info/
+
+# Node / web
+node_modules/
+web/dist/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+web/*.tsbuildinfo
