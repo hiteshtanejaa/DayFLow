@@ -30,6 +30,19 @@ export default function ScheduleView({ schedule, actions, label }: Props) {
           until resolved.
         </p>
       )}
+
+      {schedule.preference_violations.length > 0 && (
+        <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#fff8e6", borderRadius: 4 }}>
+          <p style={{ margin: "0 0 0.35rem", fontSize: "0.85rem", fontWeight: "bold" }}>
+            Didn't quite match what you asked for:
+          </p>
+          {schedule.preference_violations.map((v, i) => (
+            <p key={i} style={{ margin: "0.15rem 0", fontSize: "0.85rem" }}>
+              {v.message}
+            </p>
+          ))}
+        </div>
+      )}
       <div style={{ marginTop: "0.75rem" }}>
         <button disabled={schedule.violations.length > 0}>Confirm</button>{" "}
         <button onClick={() => setShowAudit((v) => !v)}>

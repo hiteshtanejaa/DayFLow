@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { submitIntake, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock } from "./api";
+import { submitIntake, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock, TaskPreference } from "./api";
 import ScheduleView from "./ScheduleView";
+import ClarificationChat from "./ClarificationChat";
 
 type ModeChoice = OrchestrationMode | "compare";
 
@@ -41,6 +42,13 @@ export default function App() {
   const [results, setResults] = useState<Result[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Turn-by-turn preference elicitation, run once before the first build
+  // (see design notes) — shared identically by both orchestration modes so
+  // the RQ1 compare view never varies by which mode got asked better
+  // questions. clarifying === true shows the chat in place of the build
+  // button; preferences carries forward into disruption re-plans too.
+  const [clarifying, setClarifying] = useState(false);
+  const [preferences, setPreferences] = useState<TaskPreference[]>([]);
 
   const dayBounds = () => {
     const today = new Date();
@@ -55,7 +63,7 @@ export default function App() {
   // *same* ScheduleView/DayCalendar components in place instead of
   // remounting them, which is what lets framer-motion animate the
   // before/after diff instead of just popping in a whole new calendar.
-  const runPipeline = async (effectiveTranscript: string) => {
+  const runPipeline = async (effectiveTranscript: string, prefs: TaskPreference[]) => {
     setLoading(true);
     setError(null);
     try {
@@ -63,15 +71,15 @@ export default function App() {
 
       if (modeChoice === "compare") {
         const [reactResult, hierResult] = await Promise.all([
-          submitIntake(effectiveTranscript, dayStart, dayEnd, "react"),
-          submitIntake(effectiveTranscript, dayStart, dayEnd, "hierarchical"),
+          submitIntake(effectiveTranscript, dayStart, dayEnd, "react", prefs),
+          submitIntake(effectiveTranscript, dayStart, dayEnd, "hierarchical", prefs),
         ]);
         setResults([
           { schedule: reactResult.schedule, actions: reactResult.agent_actions },
           { schedule: hierResult.schedule, actions: hierResult.agent_actions },
         ]);
       } else {
-        const result = await submitIntake(effectiveTranscript, dayStart, dayEnd, modeChoice);
+        const result = await submitIntake(effectiveTranscript, dayStart, dayEnd, modeChoice, prefs);
         setResults([{ schedule: result.schedule, actions: result.agent_actions }]);
       }
     } catch (e) {
@@ -81,7 +89,18 @@ export default function App() {
     }
   };
 
-  const handleSubmit = () => runPipeline(transcript);
+  const handleSubmit = () => {
+    if (!transcript.trim()) return;
+    setResults(null);
+    setPreferences([]);
+    setClarifying(true);
+  };
+
+  const handleClarificationDone = (prefs: TaskPreference[]) => {
+    setClarifying(false);
+    setPreferences(prefs);
+    runPipeline(transcript, prefs);
+  };
 
   const buildDisruptionTranscript = (currentBlocks: ScheduleBlock[]) => {
     const scheduleContext = describeCurrentSchedule(currentBlocks);
@@ -112,8 +131,14 @@ export default function App() {
 
       if (modeChoice === "compare") {
         const [reactResult, hierResult] = await Promise.all([
-          submitIntake(buildDisruptionTranscript(results[0].schedule.blocks), dayStart, dayEnd, "react"),
-          submitIntake(buildDisruptionTranscript(results[1].schedule.blocks), dayStart, dayEnd, "hierarchical"),
+          submitIntake(buildDisruptionTranscript(results[0].schedule.blocks), dayStart, dayEnd, "react", preferences),
+          submitIntake(
+            buildDisruptionTranscript(results[1].schedule.blocks),
+            dayStart,
+            dayEnd,
+            "hierarchical",
+            preferences,
+          ),
         ]);
         setResults([
           { schedule: reactResult.schedule, actions: reactResult.agent_actions },
@@ -121,7 +146,7 @@ export default function App() {
         ]);
       } else {
         const combined = buildDisruptionTranscript(results[0].schedule.blocks);
-        const result = await submitIntake(combined, dayStart, dayEnd, modeChoice);
+        const result = await submitIntake(combined, dayStart, dayEnd, modeChoice, preferences);
         setResults([{ schedule: result.schedule, actions: result.agent_actions }]);
       }
     } catch (e) {
@@ -141,6 +166,7 @@ export default function App() {
         placeholder="I have interview prep, gym, and coursework today, but I am feeling pretty tired."
         rows={4}
         style={{ width: "100%" }}
+        disabled={clarifying}
       />
 
       <div style={{ margin: "0.75rem 0" }}>
@@ -173,10 +199,16 @@ export default function App() {
         </label>
       </div>
 
-      <button onClick={handleSubmit} disabled={loading || !transcript}>
-        {loading ? "Thinking..." : "Build my schedule"}
-      </button>
+      {!clarifying && (
+        <button onClick={handleSubmit} disabled={loading || !transcript}>
+          {loading ? "Thinking..." : "Build my schedule"}
+        </button>
+      )}
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+
+      {clarifying && (
+        <ClarificationChat transcript={transcript} dayStart={dayBounds().dayStart} onDone={handleClarificationDone} />
+      )}
 
       {results && (
         <>

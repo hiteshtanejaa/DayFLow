@@ -32,20 +32,25 @@ from typing import Any, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 from openai import OpenAI
+from pydantic import BaseModel
 
 from app.config import get_settings
 from app.models.schemas import (
     AgentActionLog,
     BusySlot,
+    ClarifyingQuestion,
     IntakeResult,
     OrchestrationMode,
+    PreferenceCategory,
+    PreferenceViolation,
     ProposedSchedule,
     ScheduleBlock,
     ScheduleViolation,
     Task,
+    TaskPreference,
 )
 from app.scheduling.engine import build_schedule
-from app.scheduling.validator import validate_schedule
+from app.scheduling.validator import check_preferences, validate_schedule
 
 MAX_REACT_ITERATIONS = 6
 
@@ -203,6 +208,150 @@ def extract_intent(
     return result, log
 
 
+# --------------------------------------------------------------------------
+# Clarification loop — shared preprocessing before either orchestration
+# mode runs (keeps the RQ1 comparison apples-to-apples: both modes see the
+# exact same clarified task list, never a mode-specific one). Turn-by-turn:
+# the caller (main.py) asks for one question at a time, shows it to the
+# user, sends back the answer, and repeats until this returns None or the
+# user says they're satisfied — the same two-stop-condition shape as the
+# ReAct loop's own "done or give up" logic, applied to elicitation instead
+# of tool-calling.
+# --------------------------------------------------------------------------
+
+
+class _ClarificationDecision(BaseModel):
+    """Internal parse target only — never crosses the API boundary."""
+
+    has_question: bool
+    task_title: str = ""
+    category: PreferenceCategory = PreferenceCategory.TIME_WINDOW
+    question_text: str = ""
+
+
+class _InferredPreferences(BaseModel):
+    """Internal parse target only — never crosses the API boundary."""
+
+    preferences: list[TaskPreference] = []
+
+
+def infer_conventional_preferences(tasks: list[Task]) -> list[TaskPreference]:
+    """The "infer, don't ask" half of the clarification design: silent,
+    general-knowledge time-of-day defaults (dinner -> evening, breakfast ->
+    morning, ...). Runs once per conversation, before the turn-by-turn
+    ambiguity loop starts, precisely so these never show up as questions —
+    generate_clarifying_question is also told to skip them, but this is
+    what actually gets them onto the schedule at the right time rather
+    than merely not-asked-about-and-then-placed-wherever.
+    """
+    if not tasks:
+        return []
+    task_lines = "\n".join(f"- {t.title}" for t in tasks)
+    response = _client().responses.parse(
+        model=_fast_model(),
+        input=[
+            {
+                "role": "user",
+                "content": (
+                    "Here are today's tasks:\n"
+                    f"{task_lines}\n\n"
+                    "Using general knowledge of when activities conventionally "
+                    "happen (dinner in the evening, breakfast in the morning, "
+                    "lunch at midday, and similarly obvious cases), list a "
+                    "time_window preference for every task that has a clear, "
+                    "widely-shared conventional time. Skip any task without "
+                    "one — leave those for the user to clarify rather than "
+                    "guessing."
+                ),
+            }
+        ],
+        text_format=_InferredPreferences,
+    )
+    prefs = response.output_parsed.preferences
+    for p in prefs:
+        p.category = PreferenceCategory.TIME_WINDOW
+    return prefs
+
+
+def generate_clarifying_question(
+    tasks: list[Task], already_answered: list[TaskPreference]
+) -> Optional[ClarifyingQuestion]:
+    """Looks at the task list and what's already been resolved, and decides
+    whether there's one more genuinely schedule-relevant ambiguity worth a
+    question. Silent inference (e.g. "dinner" -> evening) never reaches
+    here — the model is explicitly told to leave conventionally-timed
+    tasks alone rather than ask about them.
+    """
+    covered = ", ".join(p.task_title for p in already_answered) or "none yet"
+    task_lines = "\n".join(
+        f"- {t.title} ({t.duration_minutes} min, {t.energy_required.value} energy)"
+        for t in tasks
+    )
+    response = _client().responses.parse(
+        model=_fast_model(),
+        input=[
+            {
+                "role": "user",
+                "content": (
+                    "You are helping build today's schedule from this task list:\n"
+                    f"{task_lines}\n\n"
+                    f"Preferences already clarified for: {covered}.\n\n"
+                    "Tasks with an obvious conventional time (dinner -> evening, "
+                    "breakfast -> morning, lunch -> midday, etc.) will be handled "
+                    "automatically — never ask about those. Only ask about a task "
+                    "if its placement is genuinely ambiguous and would meaningfully "
+                    "change the schedule: no stated time and no obvious "
+                    "convention, unclear ordering relative to another named task, "
+                    "or unclear energy timing. Pick the single most impactful "
+                    "remaining ambiguity not already covered above and phrase one "
+                    "short, natural question about it. If nothing meaningfully "
+                    "ambiguous remains, set has_question to false."
+                ),
+            }
+        ],
+        text_format=_ClarificationDecision,
+    )
+    decision = response.output_parsed
+    if not decision.has_question or not decision.task_title.strip():
+        return None
+    return ClarifyingQuestion(
+        task_title=decision.task_title,
+        category=decision.category,
+        question_text=decision.question_text,
+    )
+
+
+def parse_clarification_answer(question: ClarifyingQuestion, answer_text: str) -> TaskPreference:
+    """Parses one free-text reply into the typed preference vocabulary
+    shared with check_preferences (validator.py) — so what gets asked and
+    what later gets checked are never out of sync.
+    """
+    response = _client().responses.parse(
+        model=_fast_model(),
+        input=[
+            {
+                "role": "user",
+                "content": (
+                    f'The user was asked: "{question.question_text}" (about the '
+                    f'task "{question.task_title}"). They replied: "{answer_text}".\n\n'
+                    "Parse this into a single structured preference for that task. "
+                    "Use category=time_window if they named a time of day, "
+                    "category=relative_order if they said it should come before "
+                    "or after another named task (set reference_task to that "
+                    "task's exact title), or category=energy_match if they "
+                    "described an energy level for it. If the reply is vague or "
+                    "doesn't map cleanly, make your best reasonable judgment "
+                    "rather than leaving fields empty."
+                ),
+            }
+        ],
+        text_format=TaskPreference,
+    )
+    pref = response.output_parsed
+    pref.task_title = question.task_title
+    return pref
+
+
 def _propose_and_validate(
     tasks: list[Task],
     day_start: datetime,
@@ -211,17 +360,23 @@ def _propose_and_validate(
     mode: OrchestrationMode,
     reasoning_depth: str,
     use_llm_reasoning: bool = True,
+    preferences: list[TaskPreference] | None = None,
 ) -> tuple[ProposedSchedule, AgentActionLog]:
     """Scheduling Orchestrator Agent (hierarchical mode only).
 
     The LLM only produces the user-facing rationale text; the actual block
     placement always comes from the deterministic engine, and every output
     is re-checked by the validator before being returned — per the
-    hallucination-mitigation design in the proposal.
+    hallucination-mitigation design in the proposal. `preferences` (from
+    the clarification loop, if any were collected) are honored best-effort
+    by the engine and then mechanically re-checked here; any mismatch is
+    surfaced as a preference_violation, never silently corrected.
     """
     t0 = time.perf_counter()
-    blocks = build_schedule(tasks, day_start, day_end, busy)
+    preferences = preferences or []
+    blocks = build_schedule(tasks, day_start, day_end, busy, preferences)
     violations = validate_schedule(blocks, day_start, day_end, busy)
+    pref_violations = check_preferences(blocks, preferences)
 
     if use_llm_reasoning:
         reasoning = _client().responses.create(
@@ -249,13 +404,14 @@ def _propose_and_validate(
         reasoning_summary=reasoning_text,
         violations=violations,
         orchestration_mode=mode,
+        preference_violations=pref_violations,
     )
     log = _log(
         mode,
         "SchedulingOrchestrator",
         f"propose_schedule[{reasoning_depth}]",
         f"{len(tasks)} tasks",
-        f"{len(blocks)} blocks, {len(violations)} violations",
+        f"{len(blocks)} blocks, {len(violations)} violations, {len(pref_violations)} preference mismatches",
         t0,
         reasoning_text,
         usage=reasoning_usage,
@@ -275,6 +431,7 @@ class HierState(TypedDict):
     day_end: datetime
     busy: list[BusySlot]
     use_llm_reasoning: bool
+    preferences: list[TaskPreference]
     intake: Optional[IntakeResult]
     schedule: Optional[ProposedSchedule]
     disruption: Optional[dict]  # populated by Step 8's Execution Monitor
@@ -298,6 +455,7 @@ def _orchestrator_node(state: HierState) -> dict:
         OrchestrationMode.HIERARCHICAL,
         reasoning_depth="medium",
         use_llm_reasoning=state["use_llm_reasoning"],
+        preferences=state["preferences"],
     )
     return {"schedule": schedule, "logs": state["logs"] + [log]}
 
@@ -343,6 +501,7 @@ def run_hierarchical(
     day_end: datetime,
     busy: list[BusySlot],
     use_llm_reasoning: bool = True,
+    preferences: list[TaskPreference] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
     initial: HierState = {
         "transcript": transcript,
@@ -350,6 +509,7 @@ def run_hierarchical(
         "day_end": day_end,
         "busy": busy,
         "use_llm_reasoning": use_llm_reasoning,
+        "preferences": preferences or [],
         "intake": None,
         "schedule": None,
         "disruption": None,
@@ -422,11 +582,16 @@ def _react_tool_defs() -> list[dict]:
 
 
 def _dispatch_propose_schedule(
-    args: dict, day_start: datetime, day_end: datetime, busy: list[BusySlot]
-) -> tuple[dict, list[ScheduleBlock], list[ScheduleViolation]]:
+    args: dict,
+    day_start: datetime,
+    day_end: datetime,
+    busy: list[BusySlot],
+    preferences: list[TaskPreference],
+) -> tuple[dict, list[ScheduleBlock], list[ScheduleViolation], list[PreferenceViolation]]:
     tasks = [Task(**t) for t in args.get("tasks", [])]
-    blocks = build_schedule(tasks, day_start, day_end, busy)
+    blocks = build_schedule(tasks, day_start, day_end, busy, preferences)
     violations = validate_schedule(blocks, day_start, day_end, busy)
+    pref_violations = check_preferences(blocks, preferences)
     result = {
         "blocks": [
             {
@@ -442,7 +607,7 @@ def _dispatch_propose_schedule(
         ],
         "violations": [v.model_dump(mode="json") for v in violations],
     }
-    return result, blocks, violations
+    return result, blocks, violations, pref_violations
 
 
 class ReActState(TypedDict):
@@ -450,11 +615,13 @@ class ReActState(TypedDict):
     day_end: datetime
     busy: list[BusySlot]
     use_llm_reasoning: bool
+    preferences: list[TaskPreference]
     conversation: list[dict]  # new input items to send this turn
     previous_response_id: Optional[str]
     pending_calls: list[Any]
     last_blocks: list[ScheduleBlock]
     last_violations: list[ScheduleViolation]
+    last_preference_violations: list[PreferenceViolation]
     reasoning_text: Optional[str]
     iterations: int
     logs: list[AgentActionLog]
@@ -509,14 +676,15 @@ def _react_tools_node(state: ReActState) -> dict:
     t0 = time.perf_counter()
     next_items: list[dict] = []
     last_blocks, last_violations = state["last_blocks"], state["last_violations"]
+    last_pref_violations = state["last_preference_violations"]
     tool_names: list[str] = []
 
     for fc in state["pending_calls"]:
         args = json.loads(fc.arguments)
-        result, blocks, violations = _dispatch_propose_schedule(
-            args, state["day_start"], state["day_end"], state["busy"]
+        result, blocks, violations, pref_violations = _dispatch_propose_schedule(
+            args, state["day_start"], state["day_end"], state["busy"], state["preferences"]
         )
-        last_blocks, last_violations = blocks, violations
+        last_blocks, last_violations, last_pref_violations = blocks, violations, pref_violations
         tool_names.append(fc.name)
         next_items.append(
             {"type": "function_call_output", "call_id": fc.call_id, "output": json.dumps(result)}
@@ -527,7 +695,8 @@ def _react_tools_node(state: ReActState) -> dict:
         "ReActAgent",
         f"tool_execution[{','.join(tool_names)}]",
         f"{len(state['pending_calls'])} call(s)",
-        f"{len(last_blocks)} blocks, {len(last_violations)} violations",
+        f"{len(last_blocks)} blocks, {len(last_violations)} violations, "
+        f"{len(last_pref_violations)} preference mismatches",
         t0,
     )
 
@@ -535,6 +704,7 @@ def _react_tools_node(state: ReActState) -> dict:
         "conversation": next_items,
         "last_blocks": last_blocks,
         "last_violations": last_violations,
+        "last_preference_violations": last_pref_violations,
         "pending_calls": [],
         "logs": state["logs"] + [log],
     }
@@ -609,12 +779,14 @@ def run_react(
     day_end: datetime,
     busy: list[BusySlot],
     use_llm_reasoning: bool = True,
+    preferences: list[TaskPreference] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
     initial: ReActState = {
         "day_start": day_start,
         "day_end": day_end,
         "busy": busy,
         "use_llm_reasoning": use_llm_reasoning,
+        "preferences": preferences or [],
         "conversation": [
             {"role": "system", "content": _react_system_prompt(day_start)},
             {"role": "user", "content": transcript},
@@ -623,6 +795,7 @@ def run_react(
         "pending_calls": [],
         "last_blocks": [],
         "last_violations": [],
+        "last_preference_violations": [],
         "reasoning_text": None,
         "iterations": 0,
         "logs": [],
@@ -634,6 +807,7 @@ def run_react(
         reasoning_summary=final_state["reasoning_text"] or "",
         violations=final_state["last_violations"],
         orchestration_mode=OrchestrationMode.REACT,
+        preference_violations=final_state["last_preference_violations"],
     )
     return schedule, final_state["logs"]
 
@@ -650,12 +824,16 @@ def run_pipeline(
     busy: list[BusySlot],
     use_llm_reasoning: bool = True,
     mode: str | None = None,
+    preferences: list[TaskPreference] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
     """`mode` overrides the ORCHESTRATION_MODE env var for this call only —
     deliberately a per-call parameter, not a mutation of the cached
     Settings singleton, so concurrent requests under different modes
-    (e.g. the web UI's side-by-side compare) never race each other."""
+    (e.g. the web UI's side-by-side compare) never race each other.
+    `preferences` (from the clarification loop) are identical for both
+    modes on a given request — the RQ1 comparison stays about
+    orchestration, not about which mode got asked better questions."""
     resolved_mode = mode or get_settings().orchestration_mode
     if resolved_mode == "react":
-        return run_react(transcript, day_start, day_end, busy, use_llm_reasoning)
-    return run_hierarchical(transcript, day_start, day_end, busy, use_llm_reasoning)
+        return run_react(transcript, day_start, day_end, busy, use_llm_reasoning, preferences)
+    return run_hierarchical(transcript, day_start, day_end, busy, use_llm_reasoning, preferences)

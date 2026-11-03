@@ -62,12 +62,69 @@ class ScheduleViolation(BaseModel):
     reason: str
 
 
+class PreferenceCategory(str, Enum):
+    TIME_WINDOW = "time_window"
+    RELATIVE_ORDER = "relative_order"
+    ENERGY_MATCH = "energy_match"
+
+
+class TimeWindow(str, Enum):
+    MORNING = "morning"
+    AFTERNOON = "afternoon"
+    EVENING = "evening"
+    NIGHT = "night"
+
+
+class RelativeOrder(str, Enum):
+    BEFORE = "before"
+    AFTER = "after"
+
+
+# Hour ranges (24h, local wall-clock) backing each TimeWindow. Deliberately
+# coarse and shared by both the clarification agent's silent inference (e.g.
+# "dinner" -> EVENING) and the deterministic intent-check -- a single source
+# of truth so what gets asked/inferred and what gets checked never drift.
+TIME_WINDOW_HOURS: dict[TimeWindow, tuple[int, int]] = {
+    TimeWindow.MORNING: (6, 12),
+    TimeWindow.AFTERNOON: (12, 17),
+    TimeWindow.EVENING: (17, 21),
+    TimeWindow.NIGHT: (21, 24),
+}
+
+
+class TaskPreference(BaseModel):
+    """One clarified, typed constraint on where a task should land. Soft by
+    design -- the engine tries to honor it, but if it can't, the schedule
+    still gets built and the mismatch is flagged rather than silently
+    dropped or forced (see check_preferences in scheduling/validator.py)."""
+
+    task_title: str
+    category: PreferenceCategory
+    time_window: Optional[TimeWindow] = None
+    relative_order: Optional[RelativeOrder] = None
+    reference_task: Optional[str] = None  # for RELATIVE_ORDER: the other task's title
+    energy_slot: Optional[EnergyLevel] = None  # for ENERGY_MATCH
+
+
+class ClarifyingQuestion(BaseModel):
+    task_title: str
+    category: PreferenceCategory
+    question_text: str
+
+
+class PreferenceViolation(BaseModel):
+    task_title: str
+    category: PreferenceCategory
+    message: str
+
+
 class ProposedSchedule(BaseModel):
     id: Optional[str] = None
     blocks: list[ScheduleBlock]
     reasoning_summary: str
     violations: list[ScheduleViolation] = Field(default_factory=list)
     orchestration_mode: OrchestrationMode
+    preference_violations: list[PreferenceViolation] = Field(default_factory=list)
 
 
 class DisruptionEvent(BaseModel):
