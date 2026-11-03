@@ -188,7 +188,10 @@ def extract_intent(
                     f"transcript:\n\n{transcript}\n\n"
                     "If a task has a specific fixed start time mentioned (e.g. "
                     "\"moved to 3pm\"), set fixed_start using today's date above — "
-                    "never invent a different year."
+                    "never invent a different year. Extract only concrete "
+                    "activities the user themselves will do. Ignore instructions "
+                    "addressed to the assistant (e.g. \"design a schedule for the "
+                    "rest of my day\", \"plan my day\") — those are not tasks."
                 ),
             }
         ],

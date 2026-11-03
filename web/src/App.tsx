@@ -51,10 +51,16 @@ export default function App() {
   const [preferences, setPreferences] = useState<TaskPreference[]>([]);
 
   const dayBounds = () => {
-    const today = new Date();
-    const dayStart = new Date(today.setHours(8, 0, 0, 0)).toISOString();
-    const dayEnd = new Date(today.setHours(20, 0, 0, 0)).toISOString();
-    return { dayStart, dayEnd };
+    // Local wall-clock ISO with NO "Z"/offset. The backend treats every
+    // datetime as naive wall-clock (engine._naive strips tzinfo without
+    // converting), so sending toISOString() (UTC) shifted the working day by
+    // the browser's UTC offset: 8am-8pm became 7am-7pm for a UTC+1 user.
+    // Europe/London only, for now (decision: UK users only). "en-CA" formats
+    // as YYYY-MM-DD. ponytail: single hardcoded zone, add a user setting if
+    // non-UK users ever matter.
+    const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(new Date());
+    const at = (hour: number) => `${date}T${String(hour).padStart(2, "0")}:00:00`;
+    return { dayStart: at(8), dayEnd: at(20) };
   };
 
   // Shared by both the initial intake and disruption updates — the only
