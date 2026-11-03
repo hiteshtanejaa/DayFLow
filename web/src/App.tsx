@@ -1,14 +1,26 @@
 import { useState } from "react";
-import { submitIntake, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock, TaskPreference } from "./api";
+import {
+  submitIntake, decideSchedule, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock,
+  ScheduleStatus, TaskPreference,
+} from "./api";
 import ScheduleView from "./ScheduleView";
 import ClarificationChat from "./ClarificationChat";
 
 type ModeChoice = OrchestrationMode | "compare";
 
 interface Result {
+  scheduleId: string;
+  status: ScheduleStatus;
   schedule: ProposedSchedule;
   actions: AgentActionLog[];
 }
+
+const toResult = (r: { schedule_id: string; schedule: ProposedSchedule; agent_actions: AgentActionLog[] }): Result => ({
+  scheduleId: r.schedule_id,
+  status: "pending",
+  schedule: r.schedule,
+  actions: r.agent_actions,
+});
 
 // Real bug this fixes: naively appending "Update: <disruption text>" to the
 // original transcript gives the model no signal that a task named in the
@@ -80,18 +92,28 @@ export default function App() {
           submitIntake(effectiveTranscript, dayStart, dayEnd, "react", prefs),
           submitIntake(effectiveTranscript, dayStart, dayEnd, "hierarchical", prefs),
         ]);
-        setResults([
-          { schedule: reactResult.schedule, actions: reactResult.agent_actions },
-          { schedule: hierResult.schedule, actions: hierResult.agent_actions },
-        ]);
+        setResults([toResult(reactResult), toResult(hierResult)]);
       } else {
         const result = await submitIntake(effectiveTranscript, dayStart, dayEnd, modeChoice, prefs);
-        setResults([{ schedule: result.schedule, actions: result.agent_actions }]);
+        setResults([toResult(result)]);
       }
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Confirm/reject one panel's schedule. Server is the authority (it refuses
+  // to commit a schedule with violations); the UI only mirrors its answer.
+  const handleDecision = async (index: number, decision: "confirm" | "reject") => {
+    if (!results) return;
+    setError(null);
+    try {
+      const status = await decideSchedule(results[index].scheduleId, decision);
+      setResults((rs) => rs && rs.map((r, i) => (i === index ? { ...r, status } : r)));
+    } catch (e) {
+      setError((e as Error).message);
     }
   };
 
@@ -137,23 +159,28 @@ export default function App() {
 
       if (modeChoice === "compare") {
         const [reactResult, hierResult] = await Promise.all([
-          submitIntake(buildDisruptionTranscript(results[0].schedule.blocks), dayStart, dayEnd, "react", preferences),
+          submitIntake(
+            buildDisruptionTranscript(results[0].schedule.blocks),
+            dayStart,
+            dayEnd,
+            "react",
+            preferences,
+            results[0].scheduleId,
+          ),
           submitIntake(
             buildDisruptionTranscript(results[1].schedule.blocks),
             dayStart,
             dayEnd,
             "hierarchical",
             preferences,
+            results[1].scheduleId,
           ),
         ]);
-        setResults([
-          { schedule: reactResult.schedule, actions: reactResult.agent_actions },
-          { schedule: hierResult.schedule, actions: hierResult.agent_actions },
-        ]);
+        setResults([toResult(reactResult), toResult(hierResult)]);
       } else {
         const combined = buildDisruptionTranscript(results[0].schedule.blocks);
-        const result = await submitIntake(combined, dayStart, dayEnd, modeChoice, preferences);
-        setResults([{ schedule: result.schedule, actions: result.agent_actions }]);
+        const result = await submitIntake(combined, dayStart, dayEnd, modeChoice, preferences, results[0].scheduleId);
+        setResults([toResult(result)]);
       }
     } catch (e) {
       setError((e as Error).message);
@@ -250,6 +277,8 @@ export default function App() {
                 key={i}
                 schedule={r.schedule}
                 actions={r.actions}
+                status={r.status}
+                onDecide={(d) => handleDecision(i, d)}
                 label={results.length === 2 ? (i === 0 ? "ReAct" : "Hierarchical") : undefined}
               />
             ))}

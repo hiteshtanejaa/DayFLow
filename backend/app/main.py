@@ -42,6 +42,9 @@ class IntakeRequest(BaseModel):
     # the RQ1 comparison never varies by which mode got asked better
     # questions.
     preferences: list[TaskPreference] = []
+    # Set on a disruption re-plan: the schedule this one replaces (marked
+    # "superseded", so only one live plan per day is ever pending/committed).
+    replaces: Optional[str] = None
 
 
 class ClarifyNextRequest(BaseModel):
@@ -130,5 +133,25 @@ def intake(req: IntakeRequest, x_participant_id: Optional[str] = Header(default=
         mode=mode,
         preferences=req.preferences,
     )
-    schedule_id = store.save_schedule(schedule, logs, req.preferences, x_participant_id)
+    schedule_id = store.save_schedule(schedule, logs, req.preferences, x_participant_id, req.replaces)
     return {"schedule_id": schedule_id, "schedule": schedule, "agent_actions": logs}
+
+
+def _decide(schedule_id: str, participant_id: Optional[str], decision: str):
+    try:
+        status = store.decide(schedule_id, participant_id, decision)
+    except store.Conflict as e:
+        raise HTTPException(409, str(e))
+    if status is None:
+        raise HTTPException(404, "unknown schedule")
+    return {"schedule_id": schedule_id, "status": status}
+
+
+@app.post("/schedules/{schedule_id}/confirm")
+def confirm_schedule(schedule_id: str, x_participant_id: Optional[str] = Header(default=None)):
+    return _decide(schedule_id, x_participant_id, "committed")
+
+
+@app.post("/schedules/{schedule_id}/reject")
+def reject_schedule(schedule_id: str, x_participant_id: Optional[str] = Header(default=None)):
+    return _decide(schedule_id, x_participant_id, "rejected")

@@ -87,6 +87,7 @@ export async function submitIntake(
   dayEnd: string,
   orchestrationMode?: OrchestrationMode,
   preferences: TaskPreference[] = [],
+  replaces?: string,
 ): Promise<{ schedule_id: string; schedule: ProposedSchedule; agent_actions: AgentActionLog[] }> {
   const post = async (pid: string) =>
     fetch(`${API_BASE}/intake`, {
@@ -99,6 +100,7 @@ export async function submitIntake(
         busy_slots: [],
         preferences,
         ...(orchestrationMode ? { orchestration_mode: orchestrationMode } : {}),
+        ...(replaces ? { replaces } : {}),
       }),
     });
   let res = await post(await participantId());
@@ -106,6 +108,20 @@ export async function submitIntake(
   if (res.status === 404) res = await post(await participantId(true));
   if (!res.ok) throw new Error(`Intake failed: ${res.status}`);
   return res.json();
+}
+
+export type ScheduleStatus = "pending" | "committed" | "rejected";
+
+export async function decideSchedule(scheduleId: string, decision: "confirm" | "reject"): Promise<ScheduleStatus> {
+  const res = await fetch(`${API_BASE}/schedules/${scheduleId}/${decision}`, {
+    method: "POST",
+    headers: { "X-Participant-Id": await participantId() },
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    throw new Error(detail.detail ?? `${decision} failed: ${res.status}`);
+  }
+  return (await res.json()).status;
 }
 
 // Clarification loop — one call per turn. `tasks` is null on the first
@@ -117,7 +133,7 @@ export async function clarifyNext(
   dayStart: string,
   tasks: Task[] | null,
   answered: TaskPreference[],
-): Promise<{ tasks: Task[]; question: ClarifyingQuestion | null; done: boolean }> {
+): Promise<{ tasks: Task[]; question: ClarifyingQuestion | null; done: boolean; inferred: TaskPreference[] }> {
   const res = await fetch(`${API_BASE}/clarify/next`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

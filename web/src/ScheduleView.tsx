@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { ProposedSchedule, AgentActionLog } from "./api";
+import { ProposedSchedule, AgentActionLog, ScheduleStatus } from "./api";
 import DayCalendar from "./DayCalendar";
 
 interface Props {
   schedule: ProposedSchedule;
   actions: AgentActionLog[];
+  status: ScheduleStatus;
+  onDecide: (decision: "confirm" | "reject") => void;
   label?: string;
 }
 
-export default function ScheduleView({ schedule, actions, label }: Props) {
+export default function ScheduleView({ schedule, actions, status, onDecide, label }: Props) {
   const [showAudit, setShowAudit] = useState(false);
   const totalLatency = actions.reduce((sum, a) => sum + a.latency_ms, 0);
 
@@ -44,7 +46,26 @@ export default function ScheduleView({ schedule, actions, label }: Props) {
         </div>
       )}
       <div style={{ marginTop: "0.75rem" }}>
-        <button disabled={schedule.violations.length > 0}>Confirm</button>{" "}
+        {status === "pending" ? (
+          <>
+            <button disabled={schedule.violations.length > 0} onClick={() => onDecide("confirm")}>
+              Confirm
+            </button>{" "}
+            <button onClick={() => onDecide("reject")}>Reject</button>{" "}
+          </>
+        ) : (
+          <>
+            <strong style={{ color: status === "committed" ? "seagreen" : "#a33" }}>
+              {status === "committed" ? "Confirmed" : "Rejected"}
+            </strong>
+            {status === "rejected" && (
+              <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                {" "}
+                — describe what to change under "Something come up?" to get a new plan.
+              </span>
+            )}{" "}
+          </>
+        )}
         <button onClick={() => setShowAudit((v) => !v)}>
           {showAudit ? "Hide" : "Show"} audit trail
         </button>

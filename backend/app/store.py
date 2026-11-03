@@ -44,6 +44,10 @@ class Schedule(Base):
     violations: Mapped[list] = mapped_column(JSON, default=list)
     preference_violations: Mapped[list] = mapped_column(JSON, default=list)
     preferences: Mapped[list] = mapped_column(JSON, default=list)
+    # pending -> committed | rejected | superseded (replaced by a re-plan).
+    # Committed/rejected counts are the proposal's "reschedule acceptance rate".
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     blocks: Mapped[list["Block"]] = relationship(cascade="all, delete-orphan")
     actions: Mapped[list["AgentAction"]] = relationship(cascade="all, delete-orphan")
@@ -114,13 +118,47 @@ def participant_exists(participant_id: str) -> bool:
         return s.get(Participant, participant_id) is not None
 
 
+class Conflict(Exception):
+    """Decision not allowed in the schedule's current state."""
+
+
+def decide(schedule_id: str, participant_id: str | None, decision: str) -> str | None:
+    """Confirm ("committed") or reject a pending schedule. Returns the new
+    status, or None if the schedule is unknown or not this participant's.
+    Never commits a schedule with hard violations or unplaceable blocks (the
+    proposal's "no calendar change without a clean, confirmed plan" rule).
+    Repeating the same decision is a no-op.
+    """
+    with _Session.begin() as s:
+        row = s.get(Schedule, schedule_id)
+        if row is None or (row.participant_id and row.participant_id != participant_id):
+            return None
+        if row.status == decision:
+            return row.status
+        if row.status != "pending":
+            raise Conflict(f"schedule is already {row.status}")
+        if decision == "committed":
+            if row.violations or any(b.status == "failed" for b in row.blocks):
+                raise Conflict("schedule has unresolved constraint violations")
+            for b in row.blocks:
+                b.status = "committed"
+        row.status = decision
+        row.decided_at = datetime.utcnow()
+        return row.status
+
+
 def save_schedule(
     schedule: ProposedSchedule,
     logs: list[AgentActionLog],
     preferences: list[TaskPreference],
     participant_id: str | None = None,
+    replaces: str | None = None,
 ) -> str:
     with _Session.begin() as s:
+        if replaces:
+            old = s.get(Schedule, replaces)
+            if old and old.participant_id == participant_id and old.status in ("pending", "committed"):
+                old.status = "superseded"
         row = Schedule(
             participant_id=participant_id,
             orchestration_mode=schedule.orchestration_mode.value,
