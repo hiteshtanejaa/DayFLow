@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # framework calls for; not wired into pipeline.py right now.
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.6-flash"
+    # SQLite file for local dev. For the Supabase (EU) Postgres instance use
+    # "postgresql+psycopg://user:pass@host:5432/postgres" in .env.
+    database_url: str = "sqlite:///dayflow.db"
     supabase_url: str = ""
     supabase_key: str = ""
     google_client_id: str = ""

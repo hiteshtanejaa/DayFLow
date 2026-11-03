@@ -169,7 +169,7 @@ export default function App() {
       <textarea
         value={transcript}
         onChange={(e) => setTranscript(e.target.value)}
-        placeholder="I have interview prep, gym, and coursework today, but I am feeling pretty tired."
+        placeholder="Tell me about your day: what you need to do, any fixed times, and how you're feeling. e.g. Interview prep, gym, and dinner with friends, but I'm tired today."
         rows={4}
         style={{ width: "100%" }}
         disabled={clarifying}

@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from app import store
 from app.agents.pipeline import (
     extract_intent,
     generate_clarifying_question,
@@ -16,6 +17,7 @@ from app.config import get_settings
 from app.models.schemas import BusySlot, ClarifyingQuestion, OrchestrationMode, Task, TaskPreference
 
 app = FastAPI(title="Agentic Schedule Assistant API")
+store.configure(get_settings().database_url)
 
 app.add_middleware(
     CORSMiddleware,
@@ -99,8 +101,26 @@ def clarify_answer(req: ClarifyAnswerRequest):
     return parse_clarification_answer(req.question, req.answer_text)
 
 
+@app.post("/participants", status_code=201)
+def create_participant():
+    """Anonymous pseudonymous participant: a random UUID, no personal data.
+    ponytail: the id is the credential (unguessable UUID). Real auth
+    (Supabase Auth) when accounts are needed."""
+    return {"participant_id": store.create_participant()}
+
+
+@app.delete("/participants/{participant_id}", status_code=204)
+def delete_participant(participant_id: str):
+    """GDPR erasure: deletes the participant and everything they own."""
+    if not store.delete_participant(participant_id):
+        raise HTTPException(404, "unknown participant")
+    return Response(status_code=204)
+
+
 @app.post("/intake")
-def intake(req: IntakeRequest):
+def intake(req: IntakeRequest, x_participant_id: Optional[str] = Header(default=None)):
+    if x_participant_id and not store.participant_exists(x_participant_id):
+        raise HTTPException(404, "unknown participant")
     mode = req.orchestration_mode.value if req.orchestration_mode else None
     schedule, logs = run_pipeline(
         req.transcript,
@@ -110,4 +130,5 @@ def intake(req: IntakeRequest):
         mode=mode,
         preferences=req.preferences,
     )
-    return {"schedule": schedule, "agent_actions": logs}
+    schedule_id = store.save_schedule(schedule, logs, req.preferences, x_participant_id)
+    return {"schedule_id": schedule_id, "schedule": schedule, "agent_actions": logs}

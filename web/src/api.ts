@@ -65,25 +65,45 @@ export interface AgentActionLog {
 
 export type OrchestrationMode = "react" | "hierarchical";
 
+// Anonymous pseudonymous participant id (random UUID, no personal data),
+// created once and kept in localStorage so every schedule is stored under it.
+const PID_KEY = "dayflow_participant";
+
+async function participantId(fresh = false): Promise<string> {
+  if (!fresh) {
+    const saved = localStorage.getItem(PID_KEY);
+    if (saved) return saved;
+  }
+  const res = await fetch(`${API_BASE}/participants`, { method: "POST" });
+  if (!res.ok) throw new Error(`Could not register participant: ${res.status}`);
+  const { participant_id } = await res.json();
+  localStorage.setItem(PID_KEY, participant_id);
+  return participant_id;
+}
+
 export async function submitIntake(
   transcript: string,
   dayStart: string,
   dayEnd: string,
   orchestrationMode?: OrchestrationMode,
   preferences: TaskPreference[] = [],
-): Promise<{ schedule: ProposedSchedule; agent_actions: AgentActionLog[] }> {
-  const res = await fetch(`${API_BASE}/intake`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      transcript,
-      day_start: dayStart,
-      day_end: dayEnd,
-      busy_slots: [],
-      preferences,
-      ...(orchestrationMode ? { orchestration_mode: orchestrationMode } : {}),
-    }),
-  });
+): Promise<{ schedule_id: string; schedule: ProposedSchedule; agent_actions: AgentActionLog[] }> {
+  const post = async (pid: string) =>
+    fetch(`${API_BASE}/intake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Participant-Id": pid },
+      body: JSON.stringify({
+        transcript,
+        day_start: dayStart,
+        day_end: dayEnd,
+        busy_slots: [],
+        preferences,
+        ...(orchestrationMode ? { orchestration_mode: orchestrationMode } : {}),
+      }),
+    });
+  let res = await post(await participantId());
+  // Stored id no longer exists server-side (e.g. erased): register again once.
+  if (res.status === 404) res = await post(await participantId(true));
   if (!res.ok) throw new Error(`Intake failed: ${res.status}`);
   return res.json();
 }
