@@ -81,6 +81,7 @@ class ClarifyNextResponse(BaseModel):
 class ClarifyAnswerRequest(BaseModel):
     question: ClarifyingQuestion
     answer_text: str
+    tasks: list[Task]  # the extracted task list: lets the server reject rules about non-tasks
 
 
 @app.get("/health")
@@ -103,15 +104,18 @@ def clarify_next(req: ClarifyNextRequest):
             req.transcript, OrchestrationMode.HIERARCHICAL, reference_date=req.day_start
         )
         tasks = intake.tasks
-        inferred = infer_conventional_preferences(tasks)
+        # An explicit time from the user ("lunch at 5pm") beats a general-knowledge
+        # default ("lunch is in the afternoon"), so fixed tasks are never inferred.
+        inferred = infer_conventional_preferences([t for t in tasks if t.fixed_start is None])
 
     question = generate_clarifying_question(tasks, req.answered + inferred)
     return ClarifyNextResponse(tasks=tasks, question=question, done=question is None, inferred=inferred)
 
 
-@app.post("/clarify/answer", response_model=TaskPreference)
+@app.post("/clarify/answer", response_model=Optional[TaskPreference])
 def clarify_answer(req: ClarifyAnswerRequest):
-    return parse_clarification_answer(req.question, req.answer_text)
+    """null when the reply can't be turned into a meaningful rule."""
+    return parse_clarification_answer(req.question, req.answer_text, req.tasks)
 
 
 @app.post("/participants", status_code=201)

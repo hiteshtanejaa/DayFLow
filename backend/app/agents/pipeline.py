@@ -54,6 +54,15 @@ from app.scheduling.validator import check_preferences, validate_schedule
 
 MAX_REACT_ITERATIONS = 6
 
+# Real failure: "4 hours of deep work with 15 min breaks" became a separate
+# "Take a break during deep work" task that landed at 8am, before everything.
+# The engine places one block per task, so a break inside a task must not be a task.
+_BREAKS_RULE = (
+    "A break or rest that happens inside another activity (e.g. \"4 hours of deep "
+    "work with 15 min breaks\") is not a separate task: make a single task for "
+    "that activity whose duration is the total time including the breaks."
+)
+
 
 # --------------------------------------------------------------------------
 # Shared LLM client / logging helpers
@@ -191,7 +200,8 @@ def extract_intent(
                     "never invent a different year. Extract only concrete "
                     "activities the user themselves will do. Ignore instructions "
                     "addressed to the assistant (e.g. \"design a schedule for the "
-                    "rest of my day\", \"plan my day\") — those are not tasks."
+                    "rest of my day\", \"plan my day\") — those are not tasks. "
+                    + _BREAKS_RULE
                 ),
             }
         ],
@@ -276,6 +286,21 @@ def infer_conventional_preferences(tasks: list[Task]) -> list[TaskPreference]:
     return prefs
 
 
+def _resolve_title(label: str, tasks: list[Task]) -> Optional[str]:
+    """Map a model-written label onto exactly one real task title, else None.
+    Real failure this prevents: the model wrote task_title="Gym and deep work
+    timing" (a topic, not a task); loose substring matching later matched it to
+    the "Deep work" block, producing meaningless "Deep work before Deep work"
+    warnings. Exact match first; otherwise accept only an unambiguous containment.
+    """
+    norm = label.strip().lower()
+    for t in tasks:
+        if t.title.strip().lower() == norm:
+            return t.title
+    hits = [t.title for t in tasks if t.title.strip().lower() in norm or norm in t.title.strip().lower()]
+    return hits[0] if len(hits) == 1 else None
+
+
 def generate_clarifying_question(
     tasks: list[Task], already_answered: list[TaskPreference]
 ) -> Optional[ClarifyingQuestion]:
@@ -287,7 +312,9 @@ def generate_clarifying_question(
     """
     covered = ", ".join(p.task_title for p in already_answered) or "none yet"
     task_lines = "\n".join(
-        f"- {t.title} ({t.duration_minutes} min, {t.energy_required.value} energy)"
+        f"- {t.title} ({t.duration_minutes} min, {t.energy_required.value} energy"
+        + (f", FIXED at {t.fixed_start.strftime('%H:%M')}" if t.fixed_start else "")
+        + ")"
         for t in tasks
     )
     response = _client().responses.parse(
@@ -299,6 +326,10 @@ def generate_clarifying_question(
                     "You are helping build today's schedule from this task list:\n"
                     f"{task_lines}\n\n"
                     f"Preferences already clarified for: {covered}.\n\n"
+                    "task_title MUST be copied exactly from the list above (one task). "
+                    "For an ordering question, put the task being positioned in "
+                    "task_title and name the other task in the question text. "
+                    "Never ask about a task marked FIXED: the user already gave its time. "
                     "Tasks with an obvious conventional time (dinner -> evening, "
                     "breakfast -> morning, lunch -> midday, etc.) will be handled "
                     "automatically — never ask about those. Only ask about a task "
@@ -317,18 +348,26 @@ def generate_clarifying_question(
     decision = response.output_parsed
     if not decision.has_question or not decision.task_title.strip():
         return None
+    title = _resolve_title(decision.task_title, tasks)
+    if title is None:  # not a real task: asking about it could only create a bogus rule
+        return None
     return ClarifyingQuestion(
-        task_title=decision.task_title,
+        task_title=title,
         category=decision.category,
         question_text=decision.question_text,
     )
 
 
-def parse_clarification_answer(question: ClarifyingQuestion, answer_text: str) -> TaskPreference:
+def parse_clarification_answer(
+    question: ClarifyingQuestion, answer_text: str, tasks: list[Task]
+) -> Optional[TaskPreference]:
     """Parses one free-text reply into the typed preference vocabulary
     shared with check_preferences (validator.py) — so what gets asked and
-    what later gets checked are never out of sync.
+    what later gets checked are never out of sync. Returns None when the reply
+    cannot be turned into a meaningful rule (e.g. an ordering whose other task
+    is not a real task, or is the task itself) instead of storing a bogus one.
     """
+    titles = ", ".join(f'"{t.title}"' for t in tasks)
     response = _client().responses.parse(
         model=_fast_model(),
         input=[
@@ -341,7 +380,7 @@ def parse_clarification_answer(question: ClarifyingQuestion, answer_text: str) -
                     "Use category=time_window if they named a time of day, "
                     "category=relative_order if they said it should come before "
                     "or after another named task (set reference_task to that "
-                    "task's exact title), or category=energy_match if they "
+                    f"task's exact title, copied from this list: {titles}), or category=energy_match if they "
                     "described an energy level for it. If the reply is vague or "
                     "doesn't map cleanly, make your best reasonable judgment "
                     "rather than leaving fields empty."
@@ -352,6 +391,11 @@ def parse_clarification_answer(question: ClarifyingQuestion, answer_text: str) -
     )
     pref = response.output_parsed
     pref.task_title = question.task_title
+    if pref.category == PreferenceCategory.RELATIVE_ORDER:
+        ref = _resolve_title(pref.reference_task or "", tasks)
+        if not pref.relative_order or ref is None or ref == pref.task_title:
+            return None
+        pref.reference_task = ref
     return pref
 
 
@@ -772,7 +816,8 @@ def _react_system_prompt(reference_date: datetime) -> str:
         "2-3 sentence explanation of the plan for the user as your final "
         "answer — do not call the tool again once it succeeds. When writing "
         "that explanation, quote each block's `display_time` field exactly as "
-        "given — do not convert timezones or recompute times yourself."
+        "given — do not convert timezones or recompute times yourself. "
+        + _BREAKS_RULE
     )
 
 

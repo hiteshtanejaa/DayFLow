@@ -53,12 +53,54 @@ function isOutOfGrid(b: ScheduleBlock, dayStartHour: number, dayEndHour: number)
   return startOffsetHours < 0 || startOffsetHours >= dayEndHour - dayStartHour;
 }
 
+const MIN_BLOCK_PX = 20;
+
+// A 5-10 minute task is only ~5-11px tall at true scale, so it is drawn at a
+// 20px minimum; that box then covers the next block's top edge (a protein shake
+// hid behind the 4-hour deep-work block). Boxes that overlap *visually* are put
+// side by side in lanes, like Google Calendar, instead of on top of each other.
+function assignLanes(blocks: ScheduleBlock[], dayStartHour: number): Map<ScheduleBlock, { col: number; cols: number }> {
+  const boxes = blocks
+    .map((b) => {
+      const s = new Date(b.start);
+      const top = (s.getHours() + s.getMinutes() / 60 - dayStartHour) * PIXELS_PER_HOUR;
+      const h = ((new Date(b.end).getTime() - s.getTime()) / 3600000) * PIXELS_PER_HOUR - 3;
+      return { b, top, bottom: top + Math.max(h, MIN_BLOCK_PX), col: 0 };
+    })
+    .sort((x, y) => x.top - y.top);
+
+  const out = new Map<ScheduleBlock, { col: number; cols: number }>();
+  let cluster: typeof boxes = [];
+  let clusterEnd = -Infinity;
+  let laneEnds: number[] = [];
+  const flush = () => {
+    cluster.forEach((c) => out.set(c.b, { col: c.col, cols: laneEnds.length }));
+    cluster = [];
+    laneEnds = [];
+  };
+  for (const box of boxes) {
+    if (box.top >= clusterEnd) flush();
+    let col = laneEnds.findIndex((end) => end <= box.top);
+    if (col === -1) {
+      col = laneEnds.length;
+      laneEnds.push(box.bottom);
+    } else laneEnds[col] = box.bottom;
+    box.col = col;
+    cluster.push(box);
+    clusterEnd = box.top >= clusterEnd ? box.bottom : Math.max(clusterEnd, box.bottom);
+  }
+  flush();
+  return out;
+}
+
 export default function DayCalendar({ blocks, dayStartHour = 8, dayEndHour = 20 }: Props) {
   const totalHours = dayEndHour - dayStartHour;
   const containerHeight = totalHours * PIXELS_PER_HOUR;
   const hourMarks = Array.from({ length: totalHours + 1 }, (_, i) => dayStartHour + i);
 
   const inGrid = blocks.filter((b) => !isOutOfGrid(b, dayStartHour, dayEndHour));
+  const lanes = assignLanes(inGrid, dayStartHour);
+  const lane = (b: ScheduleBlock) => lanes.get(b) ?? { col: 0, cols: 1 };
   const outOfGrid = blocks.filter((b) => isOutOfGrid(b, dayStartHour, dayEndHour));
 
   return (
@@ -108,9 +150,9 @@ export default function DayCalendar({ blocks, dayStartHour = 8, dayEndHour = 20 
                   style={{
                     position: "absolute",
                     top: startOffsetHours * PIXELS_PER_HOUR,
-                    height: Math.max(durationHours * PIXELS_PER_HOUR - 3, 20),
-                    left: 6,
-                    right: 6,
+                    height: Math.max(durationHours * PIXELS_PER_HOUR - 3, MIN_BLOCK_PX),
+                    left: `calc(6px + ${lane(b).col} * (100% - 12px) / ${lane(b).cols})`,
+                    width: `calc((100% - 12px) / ${lane(b).cols} - 3px)`,
                     background: ENERGY_COLOR[b.energy_required] ?? "#4f8fc0",
                     border: "1px solid rgba(0,0,0,0.15)",
                     borderRadius: 6,

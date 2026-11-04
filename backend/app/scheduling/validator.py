@@ -135,8 +135,8 @@ def check_preferences(
             and pref.reference_task
         ):
             ref_block = _find_block(blocks, pref.reference_task)
-            if ref_block is None or ref_block.status == "failed":
-                continue
+            if ref_block is None or ref_block.status == "failed" or ref_block is block:
+                continue  # unresolved, or a task ordered relative to itself (meaningless)
             if pref.relative_order == RelativeOrder.AFTER:
                 ok = _naive(block.start) >= _naive(ref_block.end)
                 relation = "after"

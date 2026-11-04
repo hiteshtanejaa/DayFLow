@@ -86,9 +86,9 @@ export default function ClarificationChat({ transcript, dayStart, onDone }: Prop
     setError(null);
     setTurns((t) => t + 1);
 
-    let pref: TaskPreference;
+    let pref: TaskPreference | null;
     try {
-      pref = await clarifyAnswer(question, answerText);
+      pref = await clarifyAnswer(question, answerText, tasks ?? []);
     } catch (e) {
       // Undo the optimistic message so the user can just press Reply again.
       setMessages((m) => m.slice(0, -1));
@@ -97,7 +97,10 @@ export default function ClarificationChat({ transcript, dayStart, onDone }: Prop
       setLoading(false);
       return;
     }
-    const nextAnswered = [...answered, pref];
+    if (!pref) {
+      setMessages((m) => [...m, { role: "assistant", text: "I couldn't turn that into a scheduling rule, so I'll carry on." }]);
+    }
+    const nextAnswered = pref ? [...answered, pref] : answered;
     setAnswered(nextAnswered);
     setQuestion(null);
     await askNext(tasks, nextAnswered);

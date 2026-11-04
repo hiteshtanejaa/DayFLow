@@ -173,14 +173,16 @@ export async function clarifyNext(
   return res.json();
 }
 
+// null = the reply could not be turned into a meaningful rule (nothing is stored).
 export async function clarifyAnswer(
   question: ClarifyingQuestion,
   answerText: string,
-): Promise<TaskPreference> {
+  tasks: Task[],
+): Promise<TaskPreference | null> {
   const res = await fetch(`${API_BASE}/clarify/answer`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, answer_text: answerText }),
+    body: JSON.stringify({ question, answer_text: answerText, tasks }),
   });
   if (!res.ok) throw new Error(`Clarification failed: ${res.status}`);
   return res.json();
