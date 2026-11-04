@@ -29,8 +29,24 @@ export default function ClarificationChat({ transcript, dayStart, onDone }: Prop
   const [turns, setTurns] = useState(0);
   const started = useRef(false);
 
+  const [error, setError] = useState<string | null>(null);
+  const retry = useRef<(() => void) | null>(null);
+
   const askNext = async (nextTasks: Task[] | null, nextAnswered: TaskPreference[]) => {
     setLoading(true);
+    setError(null);
+    try {
+      await askNextUnsafe(nextTasks, nextAnswered);
+    } catch (e) {
+      // A failed call used to leave the chat on "Thinking..." forever. Now
+      // the user can retry, or build immediately with what's been answered.
+      setError((e as Error).message);
+      retry.current = () => askNext(nextTasks, nextAnswered);
+      setLoading(false);
+    }
+  };
+
+  const askNextUnsafe = async (nextTasks: Task[] | null, nextAnswered: TaskPreference[]) => {
     const res = await clarifyNext(transcript, dayStart, nextTasks, nextAnswered);
     setTasks(res.tasks);
 
@@ -67,9 +83,20 @@ export default function ClarificationChat({ transcript, dayStart, onDone }: Prop
     setMessages((m) => [...m, { role: "user", text: answerText }]);
     setReply("");
     setLoading(true);
+    setError(null);
     setTurns((t) => t + 1);
 
-    const pref = await clarifyAnswer(question, answerText);
+    let pref: TaskPreference;
+    try {
+      pref = await clarifyAnswer(question, answerText);
+    } catch (e) {
+      // Undo the optimistic message so the user can just press Reply again.
+      setMessages((m) => m.slice(0, -1));
+      setReply(answerText);
+      setError((e as Error).message);
+      setLoading(false);
+      return;
+    }
     const nextAnswered = [...answered, pref];
     setAnswered(nextAnswered);
     setQuestion(null);
@@ -97,6 +124,13 @@ export default function ClarificationChat({ transcript, dayStart, onDone }: Prop
           </p>
         ))}
         {loading && <p style={{ color: "#888", fontSize: "0.85rem" }}>Thinking...</p>}
+        {error && (
+          <p style={{ color: "crimson", fontSize: "0.85rem" }}>
+            Something went wrong ({error}).{" "}
+            {!question && <button onClick={() => retry.current?.()}>Try again</button>}{" "}
+            {!question && <button onClick={handleBuildNow}>Build without questions</button>}
+          </p>
+        )}
       </div>
 
       {!loading && question && (
