@@ -44,6 +44,7 @@ from app.models.schemas import (
     PreferenceCategory,
     PreferenceViolation,
     ProposedSchedule,
+    RelativeOrder,
     ScheduleBlock,
     ScheduleViolation,
     Task,
@@ -62,6 +63,33 @@ _BREAKS_RULE = (
     "work with 15 min breaks\") is not a separate task: make a single task for "
     "that activity whose duration is the total time including the breaks."
 )
+
+# Real failure: "gym, then a shake, then freshen up, then deep work" was planned
+# as four unrelated tasks, so "freshen up" landed at 8am before the gym.
+_ORDER_RULE = (
+    "If the user states a sequence (\"X, then Y\", \"after X do Y\", \"straight to Y\"), "
+    "record each link: the later task comes after the earlier one. Use exact task titles. "
+    "Only record sequencing the user actually said; never invent an order."
+)
+
+
+def _hint_prefs(hints: list[tuple[str, str]], tasks: list[Task]) -> list[TaskPreference]:
+    """(task, after) title pairs -> 'task comes AFTER after' preferences. Titles must
+    resolve to real, different tasks; anything else is dropped rather than guessed."""
+    out = []
+    for task, after in hints:
+        t, a = _resolve_title(task, tasks), _resolve_title(after, tasks)
+        if t and a and t != a:
+            out.append(TaskPreference(
+                task_title=t, category=PreferenceCategory.RELATIVE_ORDER,
+                relative_order=RelativeOrder.AFTER, reference_task=a))
+    return out
+
+
+def _merge_prefs(base: list[TaskPreference], extra: list[TaskPreference]) -> list[TaskPreference]:
+    key = lambda p: (p.task_title.lower(), p.category, p.relative_order, (p.reference_task or "").lower(), p.time_window)
+    seen = {key(p) for p in base}
+    return base + [p for p in extra if key(p) not in seen]
 
 
 # --------------------------------------------------------------------------
@@ -201,7 +229,7 @@ def extract_intent(
                     "activities the user themselves will do. Ignore instructions "
                     "addressed to the assistant (e.g. \"design a schedule for the "
                     "rest of my day\", \"plan my day\") — those are not tasks. "
-                    + _BREAKS_RULE
+                    + _BREAKS_RULE + " " + _ORDER_RULE
                 ),
             }
         ],
@@ -494,6 +522,7 @@ def _intake_node(state: HierState) -> dict:
 
 def _orchestrator_node(state: HierState) -> dict:
     intake = state["intake"]
+    hints = _hint_prefs([(h.task, h.after) for h in intake.order], intake.tasks)
     schedule, log = _propose_and_validate(
         intake.tasks,
         state["day_start"],
@@ -502,7 +531,7 @@ def _orchestrator_node(state: HierState) -> dict:
         OrchestrationMode.HIERARCHICAL,
         reasoning_depth="medium",
         use_llm_reasoning=state["use_llm_reasoning"],
-        preferences=state["preferences"],
+        preferences=_merge_prefs(state["preferences"], hints),
     )
     return {"schedule": schedule, "logs": state["logs"] + [log]}
 
@@ -605,6 +634,14 @@ def _react_tool_defs() -> list[dict]:
                                     "type": "integer",
                                     "description": "1 = highest priority, 5 = lowest",
                                 },
+                                "after": {
+                                    "type": "string",
+                                    "description": (
+                                        "Exact title of the task that must come BEFORE this "
+                                        "one, only when the user sequenced them (\"X, then "
+                                        "Y\": set `after` on Y to X). Omit otherwise."
+                                    ),
+                                },
                                 "fixed_start": {
                                     "type": "string",
                                     "description": (
@@ -635,7 +672,10 @@ def _dispatch_propose_schedule(
     busy: list[BusySlot],
     preferences: list[TaskPreference],
 ) -> tuple[dict, list[ScheduleBlock], list[ScheduleViolation], list[PreferenceViolation]]:
-    tasks = [Task(**t) for t in args.get("tasks", [])]
+    raw = args.get("tasks", [])
+    tasks = [Task(**t) for t in raw]  # Task ignores the extra `after` key
+    preferences = _merge_prefs(
+        preferences, _hint_prefs([(t["title"], t["after"]) for t in raw if t.get("after")], tasks))
     blocks = build_schedule(tasks, day_start, day_end, busy, preferences)
     violations = validate_schedule(blocks, day_start, day_end, busy)
     pref_violations = check_preferences(blocks, preferences)
@@ -817,7 +857,9 @@ def _react_system_prompt(reference_date: datetime) -> str:
         "answer — do not call the tool again once it succeeds. When writing "
         "that explanation, quote each block's `display_time` field exactly as "
         "given — do not convert timezones or recompute times yourself. "
-        + _BREAKS_RULE
+        + _BREAKS_RULE + " " + _ORDER_RULE.replace(
+            "record each link: the later task comes after the earlier one.",
+            "set `after` on the later task to the earlier task's exact title.")
     )
 
 

@@ -34,10 +34,21 @@ class Task(BaseModel):
     fixed_start: Optional[datetime] = None  # e.g. an existing calendar commitment
 
 
+class OrderHint(BaseModel):
+    """"X, then Y" said in the transcript: `task` must come after `after`.
+    Both are titles copied from the extracted task list."""
+
+    task: str
+    after: str
+
+
 class IntakeResult(BaseModel):
     tasks: list[Task]
     user_energy_level: EnergyLevel
     context_flags: list[str] = Field(default_factory=list)
+    # Sequencing the user spelled out ("gym, then a shake, then freshen up").
+    # Without this the planner placed each task independently of the stated order.
+    order: list[OrderHint] = Field(default_factory=list)
     raw_transcript: str = ""
 
 

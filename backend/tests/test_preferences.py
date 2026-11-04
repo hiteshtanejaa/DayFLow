@@ -74,3 +74,36 @@ def test_fixed_time_tasks_are_not_given_inferred_conventions(monkeypatch):
     monkeypatch.setattr(main, "generate_clarifying_question", lambda *a, **k: None)
     TestClient(main.app).post("/clarify/next", json={"transcript": "x", "day_start": "2026-08-12T08:00:00"})
     assert seen["titles"] == ["Dinner"]
+
+
+def _after(task, ref):
+    return TaskPreference(task_title=task, category=C.RELATIVE_ORDER, relative_order=RelativeOrder.AFTER, reference_task=ref)
+
+
+def test_ordering_chain_is_followed_link_by_link():
+    # the user's real sentence: shake (fixed 10:10), then freshen up, then deep work.
+    # Energy ordering alone would put the high-energy deep work first, far from the shake.
+    from datetime import timedelta
+    tasks = [
+        Task(title="Protein shake", duration_minutes=10, fixed_start=datetime(2026, 8, 12, 10, 10)),
+        Task(title="Freshen up", duration_minutes=20, energy_required="low"),
+        Task(title="Deep work", duration_minutes=240, energy_required="high"),
+    ]
+    prefs = [_after("Freshen up", "Protein shake"), _after("Deep work", "Freshen up")]
+    b = {x.title: x for x in build_schedule(tasks, *DAY, [], prefs)}
+    assert b["Freshen up"].start == b["Protein shake"].end
+    assert b["Deep work"].start == b["Freshen up"].end
+    assert check_preferences(list(b.values()), prefs) == []
+
+
+def test_ordering_cycle_does_not_hang_or_drop_tasks():
+    tasks = [Task(title="A", duration_minutes=30), Task(title="B", duration_minutes=30)]
+    blocks = build_schedule(tasks, *DAY, [], [_after("A", "B"), _after("B", "A")])
+    assert sorted(b.title for b in blocks) == ["A", "B"] and all(b.status == "pending" for b in blocks)
+
+
+def test_order_hints_become_preferences_only_for_real_distinct_tasks():
+    from app.agents.pipeline import _hint_prefs
+    tasks = [Task(title="Gym", duration_minutes=60), Task(title="Freshen up", duration_minutes=20)]
+    got = _hint_prefs([("Freshen up", "Gym"), ("Freshen up", "Freshen up"), ("Freshen up", "Yoga")], tasks)
+    assert [(p.task_title, p.reference_task) for p in got] == [("Freshen up", "Gym")]

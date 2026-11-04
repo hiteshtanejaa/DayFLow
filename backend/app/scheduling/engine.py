@@ -101,12 +101,19 @@ def _prefs_for_task(title: str, preferences: list[TaskPreference]) -> list[TaskP
     ]
 
 
+def _same_task(a: str, b: str) -> bool:
+    """Exact (case-insensitive) or one title containing the other. Needed because
+    the same task can be worded slightly differently by separate extractions."""
+    a, b = _norm(a), _norm(b)
+    return a == b or a in b or b in a
+
+
 def _find_placed(blocks: list[ScheduleBlock], title: str) -> ScheduleBlock | None:
-    target = _norm(title)
     for b in blocks:
-        if _norm(b.title) == target:
+        if _norm(b.title) == _norm(title):
             return b
-    return None
+    hits = [b for b in blocks if _same_task(b.title, title)]
+    return hits[0] if len(hits) == 1 else None
 
 
 def _make_block(task: Task, start: datetime, failed: bool = False) -> ScheduleBlock:
@@ -150,24 +157,37 @@ def _preferred_order_bounds(
     day_start: datetime,
     day_end: datetime,
 ) -> tuple[datetime, datetime]:
-    """Single pairwise only (no dependency chains) — the reference task
-    must already be in placed_so_far or this is a no-op constraint."""
-    ro = next(
-        (
-            p
-            for p in _prefs_for_task(task.title, preferences)
-            if p.category == PreferenceCategory.RELATIVE_ORDER and p.relative_order and p.reference_task
-        ),
-        None,
+    """Intersection of every before/after rule on this task whose reference is
+    already placed (build_schedule places references first, so chains
+    "A then B then C" resolve link by link). A reference that is not placed or
+    not a task is a no-op."""
+    lo, hi = day_start, day_end
+    for p in _ordering_prefs(task, preferences):
+        ref = _find_placed(placed_so_far, p.reference_task)
+        if ref is None or ref.title == task.title:
+            continue
+        if p.relative_order == RelativeOrder.AFTER:
+            lo = max(lo, ref.end)
+        else:
+            hi = min(hi, ref.start)
+    return lo, hi
+
+
+def _ordering_prefs(task: Task, preferences: list[TaskPreference]) -> list[TaskPreference]:
+    return [
+        p
+        for p in _prefs_for_task(task.title, preferences)
+        if p.category == PreferenceCategory.RELATIVE_ORDER and p.relative_order and p.reference_task
+    ]
+
+
+def _waits_for(task: Task, pending: list[Task], preferences: list[TaskPreference]) -> bool:
+    """True while some task this one is ordered against is still waiting to be placed."""
+    return any(
+        other is not task and _same_task(other.title, p.reference_task)
+        for p in _ordering_prefs(task, preferences)
+        for other in pending
     )
-    if not ro:
-        return day_start, day_end
-    ref = _find_placed(placed_so_far, ro.reference_task)
-    if ref is None:
-        return day_start, day_end
-    if ro.relative_order == RelativeOrder.AFTER:
-        return max(day_start, ref.end), day_end
-    return day_start, min(day_end, ref.start)
 
 
 def build_schedule(
@@ -208,21 +228,19 @@ def build_schedule(
     flexible_ordered = sorted(
         flexible, key=lambda t: (ENERGY_ORDER[t.energy_required], _urgency_key(t))
     )
-    # Tasks with a relative-order preference are placed after everything
-    # else, so their reference task (usually unconstrained) already has a
-    # real placement to anchor against — a single extra pass is enough
-    # since only pairwise (not chained) ordering is supported.
-    dependent = [
-        t
-        for t in flexible_ordered
-        if any(
-            p.category == PreferenceCategory.RELATIVE_ORDER
-            for p in _prefs_for_task(t.title, preferences)
-        )
-    ]
-    independent = [t for t in flexible_ordered if t not in dependent]
+    # Place in dependency order: a task goes down only once every task it is
+    # ordered against has been placed, so chains ("A, then B, then C") resolve
+    # link by link. Among ready tasks the energy/urgency order above still decides.
+    # A cycle (A after B, B after A) leaves nothing ready: place the next task
+    # unconstrained rather than loop or crash.
+    pending = list(flexible_ordered)
 
-    for task in independent + dependent:
+    def _next_task() -> Task:
+        return next((t for t in pending if not _waits_for(t, pending, preferences)), pending[0])
+
+    while pending:
+        task = _next_task()
+        pending.remove(task)
         window_start, window_end = _preferred_window(task, preferences, day_start, day_end)
         order_start, order_end = _preferred_order_bounds(task, preferences, blocks, day_start, day_end)
         search_start = max(window_start, order_start)
