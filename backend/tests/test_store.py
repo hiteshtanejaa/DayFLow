@@ -88,6 +88,21 @@ def test_replan_supersedes_previous(tmp_path, monkeypatch):
     assert c.post(f"/schedules/{old}/confirm", headers=h).status_code == 409  # superseded
 
 
+def test_old_database_gets_new_columns_without_data_loss(tmp_path):
+    import sqlite3
+    db = tmp_path / "old.db"
+    c = sqlite3.connect(db)
+    c.execute("create table participants (id varchar(36) primary key, created_at datetime)")
+    c.execute("insert into participants values ('p1', '2026-01-01 00:00:00')")
+    c.commit(); c.close()
+
+    store.configure(f"sqlite:///{db}")
+
+    c = sqlite3.connect(db)
+    assert "google_refresh_token" in [r[1] for r in c.execute("pragma table_info(participants)")]
+    assert c.execute("select id from participants").fetchall() == [("p1",)]
+
+
 def test_intake_without_participant_still_works(tmp_path, monkeypatch):
     store.configure(f"sqlite:///{tmp_path / 't.db'}")
     monkeypatch.setattr(main, "run_pipeline", _fake_pipeline)

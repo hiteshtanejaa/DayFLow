@@ -14,7 +14,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, create_engine, inspect, select, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 from app.models.schemas import AgentActionLog, ProposedSchedule, TaskPreference
@@ -32,6 +32,9 @@ class Participant(Base):
     __tablename__ = "participants"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    # ponytail: stored in plaintext. Encrypt at rest (e.g. Fernet key from env)
+    # before real participants connect real calendars.
+    google_refresh_token: Mapped[str | None] = mapped_column(Text)
     schedules: Mapped[list["Schedule"]] = relationship(cascade="all, delete-orphan")
 
 
@@ -63,6 +66,10 @@ class Block(Base):
     end: Mapped[datetime] = mapped_column(DateTime)
     energy_required: Mapped[str] = mapped_column(String(10))
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending | committed | failed
+    # Set once the block is written to the participant's calendar; sync_error
+    # holds the last failure so it can be retried (POST /schedules/{id}/sync).
+    calendar_event_id: Mapped[str | None] = mapped_column(String(200))
+    sync_error: Mapped[str | None] = mapped_column(Text)
 
 
 class AgentAction(Base):
@@ -92,7 +99,23 @@ def configure(url: str) -> None:
     args = {"check_same_thread": False} if url.startswith("sqlite") else {}
     engine = create_engine(url, connect_args=args, pool_pre_ping=True)
     Base.metadata.create_all(engine)
+    _add_missing_columns(engine)
     _Session = sessionmaker(engine, expire_on_commit=False)
+
+
+def _add_missing_columns(engine) -> None:
+    """create_all never alters existing tables, so a new column on an old database
+    fails at query time. Add missing columns (all new ones are nullable).
+    ponytail: additive only, no renames/drops/type changes. Replace with Alembic
+    before Phase 2 data exists, when a failed migration can no longer be fixed by
+    deleting the database."""
+    have = inspect(engine)
+    with engine.begin() as conn:
+        for table in Base.metadata.sorted_tables:
+            present = {c["name"] for c in have.get_columns(table.name)}
+            for col in table.columns:
+                if col.name not in present:
+                    conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN {col.name} {col.type.compile(engine.dialect)}"))
 
 
 def create_participant() -> str:
@@ -116,6 +139,61 @@ def delete_participant(participant_id: str) -> bool:
 def participant_exists(participant_id: str) -> bool:
     with _Session() as s:
         return s.get(Participant, participant_id) is not None
+
+
+def set_google_token(participant_id: str, token: str | None) -> None:
+    with _Session.begin() as s:
+        s.get(Participant, participant_id).google_refresh_token = token
+
+
+def get_google_token(participant_id: str) -> str | None:
+    with _Session() as s:
+        p = s.get(Participant, participant_id)
+        return p.google_refresh_token if p else None
+
+
+def schedule_status(schedule_id: str, participant_id: str | None) -> str | None:
+    """Status if the schedule exists and belongs to this participant, else None."""
+    with _Session() as s:
+        row = s.get(Schedule, schedule_id)
+        if row is None or (row.participant_id and row.participant_id != participant_id):
+            return None
+        return row.status
+
+
+def blocks_to_sync(schedule_id: str) -> list[dict]:
+    """Committed blocks not yet on the calendar (new, or a previous attempt failed)."""
+    with _Session() as s:
+        rows = s.scalars(select(Block).where(
+            Block.schedule_id == schedule_id, Block.status == "committed", Block.calendar_event_id.is_(None)))
+        return [{"id": b.id, "title": b.title, "start": b.start, "end": b.end} for b in rows]
+
+
+def mark_synced(block_id: str, event_id: str) -> None:
+    with _Session.begin() as s:
+        b = s.get(Block, block_id)
+        b.calendar_event_id, b.sync_error = event_id, None
+
+
+def mark_sync_failed(block_id: str, error: str) -> None:
+    with _Session.begin() as s:
+        s.get(Block, block_id).sync_error = error[:500]
+
+
+def stale_events(participant_id: str) -> list[tuple[str, str]]:
+    """(block_id, event_id) still on the calendar for plans that were rejected or replaced."""
+    with _Session() as s:
+        rows = s.execute(
+            select(Block.id, Block.calendar_event_id).join(Schedule).where(
+                Schedule.participant_id == participant_id,
+                Schedule.status.in_(("superseded", "rejected")),
+                Block.calendar_event_id.is_not(None)))
+        return [(bid, eid) for bid, eid in rows]
+
+
+def clear_event(block_id: str) -> None:
+    with _Session.begin() as s:
+        s.get(Block, block_id).calendar_event_id = None
 
 
 class Conflict(Exception):

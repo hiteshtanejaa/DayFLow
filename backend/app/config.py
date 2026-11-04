@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     google_client_id: str = ""
     google_client_secret: str = ""
+    google_redirect_uri: str = "http://localhost:8000/calendar/google/callback"
+    frontend_url: str = "http://localhost:5173"
 
     # "react" or "hierarchical" — the experimental condition switch for RQ1.
     orchestration_mode: str = "hierarchical"

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  submitIntake, decideSchedule, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock,
+  submitIntake, decideSchedule, connectGoogle, googleConnected, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock,
   ScheduleStatus, TaskPreference,
 } from "./api";
 import ScheduleView from "./ScheduleView";
@@ -13,13 +13,20 @@ interface Result {
   status: ScheduleStatus;
   schedule: ProposedSchedule;
   actions: AgentActionLog[];
+  note?: string; // calendar read warning, or the result of writing to the calendar
 }
 
-const toResult = (r: { schedule_id: string; schedule: ProposedSchedule; agent_actions: AgentActionLog[] }): Result => ({
+const toResult = (r: {
+  schedule_id: string;
+  schedule: ProposedSchedule;
+  agent_actions: AgentActionLog[];
+  calendar_error: string | null;
+}): Result => ({
   scheduleId: r.schedule_id,
   status: "pending",
   schedule: r.schedule,
   actions: r.agent_actions,
+  note: r.calendar_error ?? undefined,
 });
 
 // Real bug this fixes: naively appending "Update: <disruption text>" to the
@@ -59,6 +66,14 @@ export default function App() {
   // the RQ1 compare view never varies by which mode got asked better
   // questions. clarifying === true shows the chat in place of the build
   // button; preferences carries forward into disruption re-plans too.
+  const [gcal, setGcal] = useState<boolean | null>(null); // null = unknown
+  useEffect(() => {
+    googleConnected().then(setGcal).catch(() => setGcal(null));
+    // The server redirects back with ?calendar=connected|error after Google sign-in.
+    const outcome = new URLSearchParams(window.location.search).get("calendar");
+    if (outcome === "error") setError("Google Calendar connection failed. Please try again.");
+    if (outcome) window.history.replaceState({}, "", window.location.pathname);
+  }, []);
   const [clarifying, setClarifying] = useState(false);
   const [preferences, setPreferences] = useState<TaskPreference[]>([]);
 
@@ -110,8 +125,13 @@ export default function App() {
     if (!results) return;
     setError(null);
     try {
-      const status = await decideSchedule(results[index].scheduleId, decision);
-      setResults((rs) => rs && rs.map((r, i) => (i === index ? { ...r, status } : r)));
+      const { status, calendar } = await decideSchedule(results[index].scheduleId, decision);
+      const note = calendar
+        ? calendar.failed
+          ? `${calendar.failed} event(s) could not be added to Google Calendar; the plan is still confirmed.`
+          : `Added ${calendar.synced} event(s) to Google Calendar.`
+        : undefined;
+      setResults((rs) => rs && rs.map((r, i) => (i === index ? { ...r, status, note } : r)));
     } catch (e) {
       setError((e as Error).message);
     }
@@ -193,6 +213,12 @@ export default function App() {
   return (
     <main style={{ maxWidth: 1000, margin: "2rem auto", fontFamily: "sans-serif", padding: "0 1rem" }}>
       <h1>Morning Intake</h1>
+      <p style={{ fontSize: "0.85rem", color: "#555", margin: "0 0 0.5rem" }}>
+        Google Calendar: {gcal ? "connected" : "not connected"}{" "}
+        {!gcal && (
+          <button onClick={() => connectGoogle().catch((e) => setError((e as Error).message))}>Connect</button>
+        )}
+      </p>
       <textarea
         value={transcript}
         onChange={(e) => setTranscript(e.target.value)}
@@ -278,6 +304,7 @@ export default function App() {
                 schedule={r.schedule}
                 actions={r.actions}
                 status={r.status}
+                note={r.note}
                 onDecide={(d) => handleDecision(i, d)}
                 label={results.length === 2 ? (i === 0 ? "ReAct" : "Hierarchical") : undefined}
               />

@@ -7,10 +7,11 @@ interface Props {
   actions: AgentActionLog[];
   status: ScheduleStatus;
   onDecide: (decision: "confirm" | "reject") => void;
+  note?: string;
   label?: string;
 }
 
-export default function ScheduleView({ schedule, actions, status, onDecide, label }: Props) {
+export default function ScheduleView({ schedule, actions, status, onDecide, note, label }: Props) {
   const [showAudit, setShowAudit] = useState(false);
   const totalLatency = actions.reduce((sum, a) => sum + a.latency_ms, 0);
 
@@ -32,6 +33,8 @@ export default function ScheduleView({ schedule, actions, status, onDecide, labe
           until resolved.
         </p>
       )}
+
+      {note && <p style={{ fontSize: "0.85rem", color: "#555", margin: "0.5rem 0 0" }}>{note}</p>}
 
       {schedule.preference_violations.length > 0 && (
         <div style={{ marginTop: "0.75rem", padding: "0.5rem 0.75rem", background: "#fff8e6", borderRadius: 4 }}>

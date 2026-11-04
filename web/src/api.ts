@@ -88,7 +88,12 @@ export async function submitIntake(
   orchestrationMode?: OrchestrationMode,
   preferences: TaskPreference[] = [],
   replaces?: string,
-): Promise<{ schedule_id: string; schedule: ProposedSchedule; agent_actions: AgentActionLog[] }> {
+): Promise<{
+  schedule_id: string;
+  schedule: ProposedSchedule;
+  agent_actions: AgentActionLog[];
+  calendar_error: string | null;
+}> {
   const post = async (pid: string) =>
     fetch(`${API_BASE}/intake`, {
       method: "POST",
@@ -112,7 +117,15 @@ export async function submitIntake(
 
 export type ScheduleStatus = "pending" | "committed" | "rejected";
 
-export async function decideSchedule(scheduleId: string, decision: "confirm" | "reject"): Promise<ScheduleStatus> {
+export interface CalendarSync {
+  synced: number;
+  failed: number;
+}
+
+export async function decideSchedule(
+  scheduleId: string,
+  decision: "confirm" | "reject",
+): Promise<{ status: ScheduleStatus; calendar: CalendarSync | null }> {
   const res = await fetch(`${API_BASE}/schedules/${scheduleId}/${decision}`, {
     method: "POST",
     headers: { "X-Participant-Id": await participantId() },
@@ -121,7 +134,24 @@ export async function decideSchedule(scheduleId: string, decision: "confirm" | "
     const detail = await res.json().catch(() => ({}));
     throw new Error(detail.detail ?? `${decision} failed: ${res.status}`);
   }
-  return (await res.json()).status;
+  return res.json();
+}
+
+export async function googleConnected(): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/calendar/status`, { headers: { "X-Participant-Id": await participantId() } });
+  return res.ok && (await res.json()).google_connected;
+}
+
+// Sends the browser to Google's consent screen; the server redirects back here.
+export async function connectGoogle(): Promise<void> {
+  const res = await fetch(`${API_BASE}/calendar/google/connect`, {
+    headers: { "X-Participant-Id": await participantId() },
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    throw new Error(detail.detail ?? `Could not start Google sign-in: ${res.status}`);
+  }
+  window.location.href = (await res.json()).url;
 }
 
 // Clarification loop — one call per turn. `tasks` is null on the first
