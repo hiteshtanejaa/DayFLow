@@ -70,6 +70,11 @@ class Block(Base):
     # holds the last failure so it can be retried (POST /schedules/{id}/sync).
     calendar_event_id: Mapped[str | None] = mapped_column(String(200))
     sync_error: Mapped[str | None] = mapped_column(Text)
+    # Execution Monitor: what actually happened. nudged_at is the first time the
+    # participant was told this block was overdue (telemetry for the RQ2 nudge metrics).
+    started_at: Mapped[datetime | None] = mapped_column(DateTime)
+    done_at: Mapped[datetime | None] = mapped_column(DateTime)
+    nudged_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 class AgentAction(Base):
@@ -203,6 +208,64 @@ def clear_event(block_id: str) -> None:
         s.get(Block, block_id).calendar_event_id = None
 
 
+def _own_block(s, block_id: str, participant_id: str | None):
+    """The block if it belongs to a committed schedule of this participant, else None."""
+    b = s.get(Block, block_id)
+    if b is None:
+        return None
+    sch = s.get(Schedule, b.schedule_id)
+    if sch.participant_id and sch.participant_id != participant_id:
+        return None
+    return b
+
+
+def mark_progress(block_id: str, participant_id: str | None, event: str, now: datetime) -> str | None:
+    """event: "start" | "done". Returns the event applied, None if unknown/not owned.
+    Raises Conflict unless the block is committed. Repeating an event is a no-op."""
+    with _Session.begin() as s:
+        b = _own_block(s, block_id, participant_id)
+        if b is None:
+            return None
+        if b.status != "committed":
+            raise Conflict("only blocks of a confirmed schedule can be started or finished")
+        if event == "done":
+            b.done_at = b.done_at or now
+        b.started_at = b.started_at or now
+        return event
+
+
+def monitor_state(participant_id: str | None, now: datetime, grace_minutes: int) -> dict:
+    """Deterministic deviation check over the participant's live (committed) plan.
+    late_start: not started `grace` minutes after its start time.
+    overrun:    started but not finished `grace` minutes after its end time.
+    Also returns per-block progress and the titles already done (for re-planning)."""
+    from datetime import timedelta
+
+    grace = timedelta(minutes=grace_minutes)
+    blocks, overdue, done_titles = [], [], []
+    with _Session.begin() as s:
+        rows = s.scalars(
+            select(Block).join(Schedule).where(
+                Schedule.participant_id == participant_id, Schedule.status == "committed", Block.status == "committed"
+            ).order_by(Block.start))
+        for b in rows:
+            blocks.append({"id": b.id, "started": b.started_at is not None, "done": b.done_at is not None})
+            if b.done_at:
+                done_titles.append(b.title)
+                continue
+            kind = None
+            if b.started_at is None and now >= b.start + grace:
+                kind = "late_start"
+            elif b.started_at is not None and now >= b.end + grace:
+                kind = "overrun"
+            if kind:
+                b.nudged_at = b.nudged_at or now
+                due = b.start if kind == "late_start" else b.end
+                overdue.append({"block_id": b.id, "schedule_id": b.schedule_id, "title": b.title, "kind": kind,
+                                "minutes_late": int((now - due).total_seconds() // 60)})
+    return {"now": now.isoformat(), "blocks": blocks, "overdue": overdue, "done_titles": done_titles}
+
+
 class Conflict(Exception):
     """Decision not allowed in the schedule's current state."""
 
@@ -270,4 +333,6 @@ def save_schedule(
         )
         s.add(row)
         s.flush()
+        for sb, rb in zip(schedule.blocks, row.blocks):  # same order; clients need ids for start/done
+            sb.id = rb.id
         return row.id

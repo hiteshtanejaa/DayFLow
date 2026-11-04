@@ -8,10 +8,12 @@ interface Props {
   status: ScheduleStatus;
   onDecide: (decision: "confirm" | "reject") => void;
   note?: string;
+  progress?: Record<string, { started: boolean; done: boolean }>;
+  onProgress?: (blockId: string, event: "start" | "done") => void;
   label?: string;
 }
 
-export default function ScheduleView({ schedule, actions, status, onDecide, note, label }: Props) {
+export default function ScheduleView({ schedule, actions, status, onDecide, note, progress, onProgress, label }: Props) {
   const [showAudit, setShowAudit] = useState(false);
   const totalLatency = actions.reduce((sum, a) => sum + a.latency_ms, 0);
 
@@ -32,6 +34,31 @@ export default function ScheduleView({ schedule, actions, status, onDecide, note
           {schedule.violations.length} constraint violation(s) — do not confirm
           until resolved.
         </p>
+      )}
+
+      {status === "committed" && onProgress && (
+        <div style={{ marginTop: "0.75rem", fontSize: "0.85rem" }}>
+          <strong>Today</strong>
+          {schedule.blocks.filter((b) => b.id).map((b) => {
+            const p = progress?.[b.id!];
+            const t = new Date(b.start).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+            return (
+              <div key={b.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.2rem 0" }}>
+                <span style={{ width: 70, color: "#666" }}>{t}</span>
+                <span style={{ flex: 1, textDecoration: p?.done ? "line-through" : "none" }}>{b.title}</span>
+                {p?.done ? (
+                  <span style={{ color: "seagreen" }}>done</span>
+                ) : (
+                  <>
+                    {!p?.started && <button onClick={() => onProgress(b.id!, "start")}>Start</button>}
+                    {p?.started && <span style={{ color: "#555" }}>in progress</span>}
+                    <button onClick={() => onProgress(b.id!, "done")}>Done</button>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {note && <p style={{ fontSize: "0.85rem", color: "#555", margin: "0.5rem 0 0" }}>{note}</p>}

@@ -50,7 +50,7 @@ from app.models.schemas import (
     Task,
     TaskPreference,
 )
-from app.scheduling.engine import build_schedule
+from app.scheduling.engine import _same_task, build_schedule
 from app.scheduling.validator import check_preferences, validate_schedule
 
 MAX_REACT_ITERATIONS = 6
@@ -90,6 +90,11 @@ def _merge_prefs(base: list[TaskPreference], extra: list[TaskPreference]) -> lis
     key = lambda p: (p.task_title.lower(), p.category, p.relative_order, (p.reference_task or "").lower(), p.time_window)
     seen = {key(p) for p in base}
     return base + [p for p in extra if key(p) not in seen]
+
+
+def _without(tasks: list[Task], skip: list[str]) -> list[Task]:
+    """Drop tasks already done (mid-day re-plan): they must not be scheduled again."""
+    return [t for t in tasks if not any(_same_task(t.title, s) for s in skip)]
 
 
 # --------------------------------------------------------------------------
@@ -507,6 +512,7 @@ class HierState(TypedDict):
     busy: list[BusySlot]
     use_llm_reasoning: bool
     preferences: list[TaskPreference]
+    skip: list[str]
     intake: Optional[IntakeResult]
     schedule: Optional[ProposedSchedule]
     disruption: Optional[dict]  # populated by Step 8's Execution Monitor
@@ -524,7 +530,7 @@ def _orchestrator_node(state: HierState) -> dict:
     intake = state["intake"]
     hints = _hint_prefs([(h.task, h.after) for h in intake.order], intake.tasks)
     schedule, log = _propose_and_validate(
-        intake.tasks,
+        _without(intake.tasks, state["skip"]),
         state["day_start"],
         state["day_end"],
         state["busy"],
@@ -578,6 +584,7 @@ def run_hierarchical(
     busy: list[BusySlot],
     use_llm_reasoning: bool = True,
     preferences: list[TaskPreference] | None = None,
+    skip: list[str] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
     initial: HierState = {
         "transcript": transcript,
@@ -586,6 +593,7 @@ def run_hierarchical(
         "busy": busy,
         "use_llm_reasoning": use_llm_reasoning,
         "preferences": preferences or [],
+        "skip": skip or [],
         "intake": None,
         "schedule": None,
         "disruption": None,
@@ -671,9 +679,10 @@ def _dispatch_propose_schedule(
     day_end: datetime,
     busy: list[BusySlot],
     preferences: list[TaskPreference],
+    skip: list[str] | None = None,
 ) -> tuple[dict, list[ScheduleBlock], list[ScheduleViolation], list[PreferenceViolation]]:
     raw = args.get("tasks", [])
-    tasks = [Task(**t) for t in raw]  # Task ignores the extra `after` key
+    tasks = _without([Task(**t) for t in raw], skip or [])  # Task ignores the extra `after` key
     preferences = _merge_prefs(
         preferences, _hint_prefs([(t["title"], t["after"]) for t in raw if t.get("after")], tasks))
     blocks = build_schedule(tasks, day_start, day_end, busy, preferences)
@@ -703,6 +712,7 @@ class ReActState(TypedDict):
     busy: list[BusySlot]
     use_llm_reasoning: bool
     preferences: list[TaskPreference]
+    skip: list[str]
     conversation: list[dict]  # new input items to send this turn
     previous_response_id: Optional[str]
     pending_calls: list[Any]
@@ -769,7 +779,7 @@ def _react_tools_node(state: ReActState) -> dict:
     for fc in state["pending_calls"]:
         args = json.loads(fc.arguments)
         result, blocks, violations, pref_violations = _dispatch_propose_schedule(
-            args, state["day_start"], state["day_end"], state["busy"], state["preferences"]
+            args, state["day_start"], state["day_end"], state["busy"], state["preferences"], state["skip"]
         )
         last_blocks, last_violations, last_pref_violations = blocks, violations, pref_violations
         tool_names.append(fc.name)
@@ -870,6 +880,7 @@ def run_react(
     busy: list[BusySlot],
     use_llm_reasoning: bool = True,
     preferences: list[TaskPreference] | None = None,
+    skip: list[str] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
     initial: ReActState = {
         "day_start": day_start,
@@ -877,6 +888,7 @@ def run_react(
         "busy": busy,
         "use_llm_reasoning": use_llm_reasoning,
         "preferences": preferences or [],
+        "skip": skip or [],
         "conversation": [
             {"role": "system", "content": _react_system_prompt(day_start)},
             {"role": "user", "content": transcript},
@@ -915,8 +927,10 @@ def run_pipeline(
     use_llm_reasoning: bool = True,
     mode: str | None = None,
     preferences: list[TaskPreference] | None = None,
+    skip: list[str] | None = None,
 ) -> tuple[ProposedSchedule, list[AgentActionLog]]:
-    """`mode` overrides the ORCHESTRATION_MODE env var for this call only —
+    """`skip`: titles of tasks already done, never re-scheduled (mid-day re-plan).
+    `mode` overrides the ORCHESTRATION_MODE env var for this call only —
     deliberately a per-call parameter, not a mutation of the cached
     Settings singleton, so concurrent requests under different modes
     (e.g. the web UI's side-by-side compare) never race each other.
@@ -925,5 +939,5 @@ def run_pipeline(
     orchestration, not about which mode got asked better questions."""
     resolved_mode = mode or get_settings().orchestration_mode
     if resolved_mode == "react":
-        return run_react(transcript, day_start, day_end, busy, use_llm_reasoning, preferences)
-    return run_hierarchical(transcript, day_start, day_end, busy, use_llm_reasoning, preferences)
+        return run_react(transcript, day_start, day_end, busy, use_llm_reasoning, preferences, skip)
+    return run_hierarchical(transcript, day_start, day_end, busy, use_llm_reasoning, preferences, skip)

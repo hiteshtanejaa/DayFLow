@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   submitIntake, decideSchedule, connectGoogle, googleConnected, ProposedSchedule, AgentActionLog, OrchestrationMode, ScheduleBlock,
-  ScheduleStatus, TaskPreference,
+  ScheduleStatus, TaskPreference, markBlock, monitorCheck, MonitorState, OverdueBlock,
 } from "./api";
 import ScheduleView from "./ScheduleView";
 import ClarificationChat from "./ClarificationChat";
@@ -52,6 +52,21 @@ function describeCurrentSchedule(blocks: ScheduleBlock[]): string {
     })
     .join(", ");
   return `For reference, here was today's tentative plan before this update — none of these times are fixed unless stated otherwise below: ${items}. `;
+}
+
+// Now in London, rounded up to the next 5 minutes and never before the 08:00 day start.
+function londonNowRounded(): { iso: string; label: string } {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).formatToParts(new Date()).map((p) => [p.type, p.value]),
+  );
+  let mins = Math.max(Number(parts.hour) * 60 + Number(parts.minute), 8 * 60);
+  mins = Math.ceil(mins / 5) * 5;
+  const hh = String(Math.floor(mins / 60)).padStart(2, "0");
+  const mm = String(mins % 60).padStart(2, "0");
+  return { iso: `${parts.year}-${parts.month}-${parts.day}T${hh}:${mm}:00`, label: `${hh}:${mm}` };
 }
 
 export default function App() {
@@ -150,10 +165,10 @@ export default function App() {
     runPipeline(transcript, prefs);
   };
 
-  const buildDisruptionTranscript = (currentBlocks: ScheduleBlock[]) => {
+  const buildDisruptionTranscript = (currentBlocks: ScheduleBlock[], update: string) => {
     const scheduleContext = describeCurrentSchedule(currentBlocks);
     return (
-      `${transcript} ${scheduleContext}Update: ${disruption}. Give a fresh, ` +
+      `${transcript} ${scheduleContext}Update: ${update}. Give a fresh, ` +
       "fully re-planned schedule. Only set a fixed start time on a task if " +
       "this update explicitly states a specific committed time for it (e.g. " +
       '"pushed to 2pm") — every other task, including ones from the ' +
@@ -163,51 +178,82 @@ export default function App() {
     );
   };
 
-  const handleDisruption = async () => {
-    if (!disruption.trim() || !results) return;
-    // Full live disruption detection (polling, push notifications) is
-    // Step 8, not this — this re-plans on demand via the same /intake
-    // endpoint. Bug fixed here: in "Compare both" mode, results[0] is
-    // always the ReAct panel — reusing it as the context for BOTH modes
-    // meant hierarchical's re-plan was being fed ReAct's schedule as if it
-    // were its own after the two had already diverged. Each mode now gets
-    // its own actual current blocks as context, not a single shared one.
+  // Re-plan on demand (typed disruption) or because the Execution Monitor saw
+  // the day slip. In "Compare both" mode each panel uses its own current
+  // blocks as context: reusing results[0] for both fed hierarchical ReAct's
+  // schedule after the two had diverged. `skip` = tasks already done, which the
+  // server never schedules again; `dayStart` lets a mid-day re-plan start now.
+  const replan = async (update: string, opts: { dayStart?: string; skip?: string[] } = {}) => {
+    if (!results) return;
     setLoading(true);
     setError(null);
     try {
-      const { dayStart, dayEnd } = dayBounds();
+      const bounds = dayBounds();
+      const dayStart = opts.dayStart ?? bounds.dayStart;
+      const run = (r: Result, mode: OrchestrationMode) =>
+        submitIntake(
+          buildDisruptionTranscript(r.schedule.blocks, update),
+          dayStart,
+          bounds.dayEnd,
+          mode,
+          preferences,
+          r.scheduleId,
+          opts.skip,
+        );
 
       if (modeChoice === "compare") {
-        const [reactResult, hierResult] = await Promise.all([
-          submitIntake(
-            buildDisruptionTranscript(results[0].schedule.blocks),
-            dayStart,
-            dayEnd,
-            "react",
-            preferences,
-            results[0].scheduleId,
-          ),
-          submitIntake(
-            buildDisruptionTranscript(results[1].schedule.blocks),
-            dayStart,
-            dayEnd,
-            "hierarchical",
-            preferences,
-            results[1].scheduleId,
-          ),
-        ]);
+        const [reactResult, hierResult] = await Promise.all([run(results[0], "react"), run(results[1], "hierarchical")]);
         setResults([toResult(reactResult), toResult(hierResult)]);
       } else {
-        const combined = buildDisruptionTranscript(results[0].schedule.blocks);
-        const result = await submitIntake(combined, dayStart, dayEnd, modeChoice, preferences, results[0].scheduleId);
-        setResults([toResult(result)]);
+        setResults([toResult(await run(results[0], modeChoice))]);
       }
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDisruption = async () => {
+    if (!disruption.trim() || !results) return;
+    await replan(disruption);
     setDisruption("");
+  };
+
+  // ---- Execution Monitor (client side): poll, nudge, start/done, re-plan ----
+  const [monitor, setMonitor] = useState<MonitorState | null>(null);
+  const [snoozed, setSnoozed] = useState<Record<string, number>>({});
+  const live = !!results?.some((r) => r.status === "committed");
+
+  const refreshMonitor = () => monitorCheck().then(setMonitor).catch(() => {});
+  useEffect(() => {
+    if (!live) {
+      setMonitor(null);
+      return;
+    }
+    refreshMonitor();
+    const timer = setInterval(refreshMonitor, 30000);
+    return () => clearInterval(timer);
+  }, [live, results]);
+
+  const handleProgress = async (blockId: string, event: "start" | "done") => {
+    try {
+      await markBlock(blockId, event);
+      await refreshMonitor();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  const nudge = monitor?.overdue.find((o) => (snoozed[o.block_id] ?? 0) < Date.now());
+  const handleNudgeReplan = (o: OverdueBlock) => {
+    const now = londonNowRounded();
+    const what =
+      o.kind === "late_start" ? `"${o.title}" has not been started` : `"${o.title}" is still running past its planned end`;
+    replan(`it is now ${now.label} and ${what}. Re-plan only what is left of today, starting now`, {
+      dayStart: now.iso,
+      skip: monitor?.done_titles ?? [],
+    });
   };
 
   return (
@@ -271,6 +317,24 @@ export default function App() {
 
       {results && (
         <>
+          {nudge && (
+            <div style={{ margin: "1rem 0 0", padding: "0.75rem", background: "#fff4e0", borderLeft: "4px solid #e49a1c", borderRadius: 4 }}>
+              <strong>
+                {nudge.kind === "late_start"
+                  ? `"${nudge.title}" was due ${nudge.minutes_late} min ago.`
+                  : `"${nudge.title}" is ${nudge.minutes_late} min past its planned end.`}
+              </strong>{" "}
+              <button onClick={() => handleProgress(nudge.block_id, "start").then(() => {})} disabled={nudge.kind !== "late_start"}>
+                Start now
+              </button>{" "}
+              <button onClick={() => handleNudgeReplan(nudge)} disabled={loading}>
+                Re-plan the rest of my day
+              </button>{" "}
+              <button onClick={() => setSnoozed((z) => ({ ...z, [nudge.block_id]: Date.now() + 10 * 60 * 1000 }))}>
+                Remind me in 10 min
+              </button>
+            </div>
+          )}
           <div style={{ margin: "1.5rem 0 0.5rem", padding: "0.75rem", background: "#f7f7f7", borderRadius: 6 }}>
             <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "bold", marginBottom: "0.35rem" }}>
               Something come up?
@@ -305,6 +369,8 @@ export default function App() {
                 actions={r.actions}
                 status={r.status}
                 note={r.note}
+                progress={Object.fromEntries((monitor?.blocks ?? []).map((b) => [b.id, b]))}
+                onProgress={handleProgress}
                 onDecide={(d) => handleDecision(i, d)}
                 label={results.length === 2 ? (i === 0 ? "ReAct" : "Hierarchical") : undefined}
               />

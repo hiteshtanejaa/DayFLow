@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # "react" or "hierarchical" — the experimental condition switch for RQ1.
     orchestration_mode: str = "hierarchical"
 
+    # Execution Monitor: minutes past a block's start (or end, if running) before nudging.
+    monitor_grace_minutes: int = 10
+
     working_hours_start: int = 8
     working_hours_end: int = 20
 

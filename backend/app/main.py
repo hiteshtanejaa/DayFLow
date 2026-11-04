@@ -24,6 +24,11 @@ store.configure(get_settings().db_url)
 log = logging.getLogger("dayflow")
 
 
+def london_now() -> datetime:
+    """Naive Europe/London wall-clock, the app's single time convention. Tests replace this."""
+    return datetime.now(calendars.LONDON).replace(tzinfo=None)
+
+
 def calendar_for(participant_id: Optional[str]) -> Optional[calendars.CalendarProvider]:
     """The participant's connected calendar, or None. Tests swap this for a mock."""
     token = store.get_google_token(participant_id) if participant_id else None
@@ -55,6 +60,8 @@ class IntakeRequest(BaseModel):
     # Set on a disruption re-plan: the schedule this one replaces (marked
     # "superseded", so only one live plan per day is ever pending/committed).
     replaces: Optional[str] = None
+    # Titles of tasks already done: a mid-day re-plan never schedules them again.
+    skip: list[str] = []
 
 
 class ClarifyNextRequest(BaseModel):
@@ -154,6 +161,7 @@ def intake(req: IntakeRequest, x_participant_id: Optional[str] = Header(default=
         busy,
         mode=mode,
         preferences=req.preferences,
+        skip=req.skip,
     )
     schedule_id = store.save_schedule(schedule, logs, req.preferences, x_participant_id, req.replaces)
     return {
@@ -208,6 +216,32 @@ def retry_sync(schedule_id: str, x_participant_id: Optional[str] = Header(defaul
     if store.schedule_status(schedule_id, x_participant_id) != "committed":
         raise HTTPException(409, "only a committed schedule can be synced")
     return {"schedule_id": schedule_id, "calendar": _sync(schedule_id, x_participant_id)}
+
+
+# ---- Execution Monitor ------------------------------------------------------
+# Deviation detection is plain code (store.monitor_state), not an LLM call: it is
+# fast, free and predictable. The client polls it; a late block becomes a nudge and,
+# if the participant accepts, a normal /intake re-plan (same path for both modes).
+
+
+@app.post("/blocks/{block_id}/{event}")
+def block_progress(block_id: str, event: str, x_participant_id: Optional[str] = Header(default=None)):
+    if event not in ("start", "done"):
+        raise HTTPException(404, "unknown event")
+    try:
+        applied = store.mark_progress(block_id, x_participant_id, event, london_now())
+    except store.Conflict as e:
+        raise HTTPException(409, str(e))
+    if applied is None:
+        raise HTTPException(404, "unknown block")
+    return {"block_id": block_id, "event": applied}
+
+
+@app.get("/monitor/check")
+def monitor_check(x_participant_id: Optional[str] = Header(default=None)):
+    if not x_participant_id or not store.participant_exists(x_participant_id):
+        raise HTTPException(404, "unknown participant")
+    return store.monitor_state(x_participant_id, london_now(), get_settings().monitor_grace_minutes)
 
 
 @app.get("/calendar/status")

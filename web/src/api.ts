@@ -11,6 +11,7 @@ export interface Task {
 }
 
 export interface ScheduleBlock {
+  id?: string | null; // database id; needed to report start/done
   task_id: string;
   title: string;
   start: string;
@@ -88,6 +89,7 @@ export async function submitIntake(
   orchestrationMode?: OrchestrationMode,
   preferences: TaskPreference[] = [],
   replaces?: string,
+  skip?: string[],
 ): Promise<{
   schedule_id: string;
   schedule: ProposedSchedule;
@@ -106,6 +108,7 @@ export async function submitIntake(
         preferences,
         ...(orchestrationMode ? { orchestration_mode: orchestrationMode } : {}),
         ...(replaces ? { replaces } : {}),
+        ...(skip?.length ? { skip } : {}),
       }),
     });
   let res = await post(await participantId());
@@ -186,4 +189,37 @@ export async function clarifyAnswer(
   });
   if (!res.ok) throw new Error(`Clarification failed: ${res.status}`);
   return res.json();
+}
+
+// ---- Execution Monitor ----
+
+export interface OverdueBlock {
+  block_id: string;
+  schedule_id: string;
+  title: string;
+  kind: "late_start" | "overrun";
+  minutes_late: number;
+}
+
+export interface MonitorState {
+  blocks: { id: string; started: boolean; done: boolean }[];
+  overdue: OverdueBlock[];
+  done_titles: string[];
+}
+
+export async function monitorCheck(): Promise<MonitorState> {
+  const res = await fetch(`${API_BASE}/monitor/check`, { headers: { "X-Participant-Id": await participantId() } });
+  if (!res.ok) throw new Error(`Monitor check failed: ${res.status}`);
+  return res.json();
+}
+
+export async function markBlock(blockId: string, event: "start" | "done"): Promise<void> {
+  const res = await fetch(`${API_BASE}/blocks/${blockId}/${event}`, {
+    method: "POST",
+    headers: { "X-Participant-Id": await participantId() },
+  });
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    throw new Error(detail.detail ?? `Could not mark block ${event}: ${res.status}`);
+  }
 }
