@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import quote_plus
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,11 +17,13 @@ class Settings(BaseSettings):
     # framework calls for; not wired into pipeline.py right now.
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.6-flash"
-    # SQLite file for local dev. For the Supabase (EU) Postgres instance use
-    # "postgresql+psycopg://user:pass@host:5432/postgres" in .env.
-    database_url: str = "sqlite:///dayflow.db"
-    supabase_url: str = ""
-    supabase_key: str = ""
+    # Explicit override ("postgresql+psycopg://..." or "sqlite:///x.db"). If empty,
+    # see `db_url`: Supabase when configured, else a local SQLite file.
+    database_url: str = ""
+    supabase_url: str = ""  # https://<project-ref>.supabase.co
+    supabase_key: str = ""  # publishable key: NOT used by the backend (it talks to Postgres directly)
+    supabase_pass: str = ""  # the project's database password
+    supabase_region: str = "eu-west-1"  # Ireland: where this project lives (GDPR: EU)
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/calendar/google/callback"
@@ -37,6 +40,22 @@ class Settings(BaseSettings):
     reoptimization_latency_target_ms: int = 12000
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @property
+    def db_url(self) -> str:
+        """DATABASE_URL, else the Supabase Postgres built from SUPABASE_URL and
+        SUPABASE_PASS (so the password is only ever written in .env, once), else SQLite."""
+        if self.database_url:
+            return self.database_url
+        if self.supabase_url and self.supabase_pass:
+            # Session pooler, not the direct db.<ref>.supabase.co host: the direct host is
+            # IPv6-only and fails to resolve on IPv4-only networks.
+            ref = self.supabase_url.split("//", 1)[-1].split(".", 1)[0]
+            return (
+                f"postgresql+psycopg://postgres.{ref}:{quote_plus(self.supabase_pass)}"
+                f"@aws-0-{self.supabase_region}.pooler.supabase.com:5432/postgres?sslmode=require"
+            )
+        return "sqlite:///dayflow.db"
 
 
 @lru_cache

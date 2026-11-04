@@ -100,6 +100,13 @@ def configure(url: str) -> None:
     engine = create_engine(url, connect_args=args, pool_pre_ping=True)
     Base.metadata.create_all(engine)
     _add_missing_columns(engine)
+    if engine.dialect.name == "postgresql":
+        # Supabase serves every public-schema table over its REST API to anyone
+        # holding the publishable key. RLS with no policies denies all of that;
+        # this backend connects as the postgres role, which bypasses RLS.
+        with engine.begin() as conn:
+            for t in Base.metadata.sorted_tables:
+                conn.execute(text(f'ALTER TABLE "{t.name}" ENABLE ROW LEVEL SECURITY'))
     _Session = sessionmaker(engine, expire_on_commit=False)
 
 

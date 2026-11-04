@@ -20,7 +20,7 @@ from app.config import get_settings
 from app.models.schemas import BusySlot, ClarifyingQuestion, OrchestrationMode, Task, TaskPreference
 
 app = FastAPI(title="Agentic Schedule Assistant API")
-store.configure(get_settings().database_url)
+store.configure(get_settings().db_url)
 log = logging.getLogger("dayflow")
 
 
