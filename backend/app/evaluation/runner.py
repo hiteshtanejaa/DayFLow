@@ -137,6 +137,9 @@ def run_benchmark(
                 continue
             print(f"[{done}/{total}] {scenario.id} / {mode} — running...", end=" ", flush=True)
             result = _run_dry(scenario, mode) if dry_run else _run_live(scenario, mode)
+            if result.error and "quota exhausted" in result.error:  # not a model failure: stop, resume later
+                print("STOPPED (daily quota): re-run this command later to continue")
+                return list(existing.values())
             existing[key] = result
             _save(path, existing)  # incremental save — survives a crash mid-run
             status = "ERROR: " + result.error if result.error else f"{result.total_latency_ms:.0f}ms"

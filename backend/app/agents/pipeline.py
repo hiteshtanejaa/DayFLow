@@ -32,6 +32,8 @@ from typing import Any, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 from openai import OpenAI
+
+from app.agents.gemini import GeminiClient
 from pydantic import BaseModel
 
 from app.config import get_settings
@@ -104,15 +106,18 @@ def _without(tasks: list[Task], skip: list[str]) -> list[Task]:
 
 @functools.lru_cache(maxsize=1)
 def _client() -> OpenAI:
-    return OpenAI(api_key=get_settings().openai_api_key)
+    s = get_settings()
+    return GeminiClient(s.gemini_api_key) if s.llm_provider == "gemini" else OpenAI(api_key=s.openai_api_key)
 
 
 def _model() -> str:
-    return get_settings().openai_model
+    s = get_settings()
+    return s.gemini_model if s.llm_provider == "gemini" else s.openai_model
 
 
 def _fast_model() -> str:
-    return get_settings().openai_fast_model
+    s = get_settings()  # gemini: one model for every call, so the tiers are matched
+    return s.gemini_model if s.llm_provider == "gemini" else s.openai_fast_model
 
 
 def _extract_text(response: Any) -> str:

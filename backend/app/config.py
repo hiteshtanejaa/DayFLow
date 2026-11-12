@@ -5,7 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # Primary LLM — pipeline.py currently calls OpenAI's Responses API.
+    # "openai" (default) or "gemini": one model serves every call when "gemini".
+    llm_provider: str = "openai"
     openai_api_key: str = ""
     openai_model: str = "gpt-5.6"
     # Cheap/fast tier for latency-insensitive-quality tasks (intake
@@ -13,8 +14,7 @@ class Settings(BaseSettings):
     # guessed: $0.20/$1.20 per 1M tokens vs the full gpt-5.6 tier.
     openai_fast_model: str = "gpt-5.6-luna"
 
-    # Kept for the cross-model comparison the proposal's evaluation
-    # framework calls for; not wired into pipeline.py right now.
+    # Used when LLM_PROVIDER=gemini (see app/agents/gemini.py).
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.6-flash"
     # Explicit override ("postgresql+psycopg://..." or "sqlite:///x.db"). If empty,

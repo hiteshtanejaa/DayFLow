@@ -1,0 +1,3794 @@
+[
+  {
+    "scenario_id": "meeting_moved_00",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Job application",
+        "title": "Job application",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T16:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Job application",
+        "title": "Job application",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T16:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Interview prep",
+      "Job application",
+      "Team meeting"
+    ],
+    "ground_truth_titles": [
+      "Team meeting",
+      "Interview prep",
+      "Job application"
+    ],
+    "total_latency_ms": 15332.316600019112,
+    "total_tokens_input": 1848,
+    "total_tokens_output": 191,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_00",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "interview prep",
+        "title": "interview prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "job application",
+        "title": "job application",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "team meeting",
+        "title": "team meeting",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T16:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Job application",
+        "title": "Job application",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T16:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "interview prep",
+      "job application",
+      "team meeting"
+    ],
+    "ground_truth_titles": [
+      "Team meeting",
+      "Interview prep",
+      "Job application"
+    ],
+    "total_latency_ms": 17735.68190028891,
+    "total_tokens_input": 396,
+    "total_tokens_output": 413,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_01",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework block",
+        "title": "Coursework block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep block",
+        "title": "Project presentation prep block",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting block",
+        "title": "Team meeting block",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Coursework block",
+      "Project presentation prep block",
+      "Team meeting block"
+    ],
+    "ground_truth_titles": [
+      "Team meeting",
+      "Coursework",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 52016.25430001877,
+    "total_tokens_input": 1860,
+    "total_tokens_output": 195,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_01",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "coursework block",
+        "title": "coursework block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "project presentation prep block",
+        "title": "project presentation prep block",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "team meeting block",
+        "title": "team meeting block",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "coursework block",
+      "project presentation prep block",
+      "team meeting block"
+    ],
+    "ground_truth_titles": [
+      "Team meeting",
+      "Coursework",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 2228.962300112471,
+    "total_tokens_input": 399,
+    "total_tokens_output": 416,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_02",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "code review",
+        "title": "code review",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "doctor's appointment",
+      "laundry",
+      "code review"
+    ],
+    "ground_truth_titles": [
+      "Code review",
+      "Laundry",
+      "Doctor's appointment"
+    ],
+    "total_latency_ms": 16882.246599765494,
+    "total_tokens_input": 1865,
+    "total_tokens_output": 202,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_02",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "code review",
+        "title": "code review",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "doctor's appointment",
+      "laundry",
+      "code review"
+    ],
+    "ground_truth_titles": [
+      "Code review",
+      "Laundry",
+      "Doctor's appointment"
+    ],
+    "total_latency_ms": 7890.784399816766,
+    "total_tokens_input": 403,
+    "total_tokens_output": 418,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_03",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "write cover letter block",
+        "title": "write cover letter block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry block",
+        "title": "laundry block",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor block",
+        "title": "call with advisor block",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "write cover letter block",
+      "laundry block",
+      "call with advisor block"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Laundry",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 18926.22570018284,
+    "total_tokens_input": 1870,
+    "total_tokens_output": 198,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_03",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T15:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "write cover letter",
+      "laundry",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Laundry",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 17102.68420004286,
+    "total_tokens_input": 400,
+    "total_tokens_output": 413,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_04",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "study session",
+        "title": "study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T14:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T14:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "study session",
+      "grocery shopping",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Study session",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 14084.780399687588,
+    "total_tokens_input": 1855,
+    "total_tokens_output": 207,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_04",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "study session",
+        "title": "study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T14:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T14:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "study session",
+      "grocery shopping",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Study session",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 42779.32930015959,
+    "total_tokens_input": 399,
+    "total_tokens_output": 410,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_05",
+    "disruption_type": "meeting_moved",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Meal prep block",
+        "title": "Meal prep block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym block",
+        "title": "Gym block",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework block",
+        "title": "Coursework block",
+        "start": "2026-08-10T16:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Meal prep",
+        "title": "Meal prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T16:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Meal prep block",
+      "Gym block",
+      "Coursework block"
+    ],
+    "ground_truth_titles": [
+      "Coursework",
+      "Meal prep",
+      "Gym"
+    ],
+    "total_latency_ms": 9055.597400059924,
+    "total_tokens_input": 1852,
+    "total_tokens_output": 196,
+    "error": null
+  },
+  {
+    "scenario_id": "meeting_moved_05",
+    "disruption_type": "meeting_moved",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "meal prep block",
+        "title": "meal prep block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "gym block",
+        "title": "gym block",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "coursework block",
+        "title": "coursework block",
+        "start": "2026-08-10T16:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Meal prep",
+        "title": "Meal prep",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T16:00:00",
+        "end": "2026-08-10T17:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "meal prep block",
+      "gym block",
+      "coursework block"
+    ],
+    "ground_truth_titles": [
+      "Coursework",
+      "Meal prep",
+      "Gym"
+    ],
+    "total_latency_ms": 87674.6616999153,
+    "total_tokens_input": 396,
+    "total_tokens_output": 406,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_00",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "coursework",
+        "title": "coursework",
+        "start": "2026-08-10T12:45:00",
+        "end": "2026-08-10T13:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "meal prep",
+        "title": "meal prep",
+        "start": "2026-08-10T13:30:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T12:45:00",
+        "end": "2026-08-10T13:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Meal prep",
+        "title": "Meal prep",
+        "start": "2026-08-10T13:30:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "read research paper",
+      "coursework",
+      "meal prep"
+    ],
+    "ground_truth_titles": [
+      "Meal prep",
+      "Read research paper",
+      "Coursework"
+    ],
+    "total_latency_ms": 69318.36170004681,
+    "total_tokens_input": 1840,
+    "total_tokens_output": 193,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_00",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "coursework",
+        "title": "coursework",
+        "start": "2026-08-10T12:45:00",
+        "end": "2026-08-10T13:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "meal prep",
+        "title": "meal prep",
+        "start": "2026-08-10T13:30:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T12:45:00",
+        "end": "2026-08-10T13:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Meal prep",
+        "title": "Meal prep",
+        "start": "2026-08-10T13:30:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "read research paper",
+      "coursework",
+      "meal prep"
+    ],
+    "ground_truth_titles": [
+      "Meal prep",
+      "Read research paper",
+      "Coursework"
+    ],
+    "total_latency_ms": 71182.26380017586,
+    "total_tokens_input": 405,
+    "total_tokens_output": 410,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_01",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Read research paper",
+      "Doctor's appointment",
+      "Call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Doctor's appointment",
+      "Call with advisor",
+      "Read research paper"
+    ],
+    "total_latency_ms": 30138.747100019827,
+    "total_tokens_input": 5674,
+    "total_tokens_output": 440,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_01",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T14:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "read research paper",
+      "doctor's appointment",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Doctor's appointment",
+      "Call with advisor",
+      "Read research paper"
+    ],
+    "total_latency_ms": 33684.963000006974,
+    "total_tokens_input": 414,
+    "total_tokens_output": 405,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_02",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Grocery shopping",
+      "Write cover letter",
+      "Gym"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Write cover letter",
+      "Gym"
+    ],
+    "total_latency_ms": 10603.313599945977,
+    "total_tokens_input": 1915,
+    "total_tokens_output": 264,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_02",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "gym",
+        "title": "gym",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T13:00:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "write cover letter",
+      "grocery shopping",
+      "gym"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Write cover letter",
+      "Gym"
+    ],
+    "total_latency_ms": 10149.909500032663,
+    "total_tokens_input": 405,
+    "total_tokens_output": 427,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_03",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Essay draft",
+      "Project presentation prep",
+      "Call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Essay draft",
+      "Call with advisor",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 9895.611899904907,
+    "total_tokens_input": 1847,
+    "total_tokens_output": 186,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_03",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "essay draft",
+        "title": "essay draft",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "project presentation prep",
+        "title": "project presentation prep",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T12:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T12:30:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T14:00:00",
+        "end": "2026-08-10T15:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "essay draft",
+      "project presentation prep",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Essay draft",
+      "Call with advisor",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 10108.517599990591,
+    "total_tokens_input": 409,
+    "total_tokens_output": 437,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_04",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "read research paper",
+      "doctor's appointment",
+      "write cover letter"
+    ],
+    "ground_truth_titles": [
+      "Read research paper",
+      "Doctor's appointment",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 8219.751499826089,
+    "total_tokens_input": 1862,
+    "total_tokens_output": 169,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_04",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T12:00:00",
+        "end": "2026-08-10T14:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "read research paper",
+      "doctor's appointment",
+      "write cover letter"
+    ],
+    "ground_truth_titles": [
+      "Read research paper",
+      "Doctor's appointment",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 119170.03759997897,
+    "total_tokens_input": 416,
+    "total_tokens_output": 401,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_05",
+    "disruption_type": "task_overrun",
+    "mode": "react",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:15:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:15:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Study session",
+      "Team meeting",
+      "Grocery shopping"
+    ],
+    "ground_truth_titles": [
+      "Study session",
+      "Team meeting",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 83593.19249959663,
+    "total_tokens_input": 11335,
+    "total_tokens_output": 687,
+    "error": null
+  },
+  {
+    "scenario_id": "task_overrun_05",
+    "disruption_type": "task_overrun",
+    "mode": "hierarchical",
+    "had_conflict_risk": true,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "study session",
+        "title": "study session",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "team meeting",
+        "title": "team meeting",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T12:15:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T12:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T12:15:00",
+        "end": "2026-08-10T13:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "study session",
+      "team meeting",
+      "grocery shopping"
+    ],
+    "ground_truth_titles": [
+      "Study session",
+      "Team meeting",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 36008.91649979167,
+    "total_tokens_input": 407,
+    "total_tokens_output": 416,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_00",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Study session",
+      "Team meeting",
+      "Laundry"
+    ],
+    "ground_truth_titles": [
+      "Study session",
+      "Team meeting",
+      "Laundry"
+    ],
+    "total_latency_ms": 13592.265200102702,
+    "total_tokens_input": 1833,
+    "total_tokens_output": 186,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_00",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "study session",
+        "title": "study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "team meeting",
+        "title": "team meeting",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "study session",
+      "team meeting",
+      "laundry"
+    ],
+    "ground_truth_titles": [
+      "Study session",
+      "Team meeting",
+      "Laundry"
+    ],
+    "total_latency_ms": 8835.181699832901,
+    "total_tokens_input": 395,
+    "total_tokens_output": 391,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_01",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T09:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Clean apartment",
+      "Gym",
+      "Laundry"
+    ],
+    "ground_truth_titles": [
+      "Gym",
+      "Laundry",
+      "Clean apartment"
+    ],
+    "total_latency_ms": 14797.918799798936,
+    "total_tokens_input": 1845,
+    "total_tokens_output": 191,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_01",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "gym block",
+        "title": "gym block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry block",
+        "title": "laundry block",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "clean apartment block",
+        "title": "clean apartment block",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "gym block",
+      "laundry block",
+      "clean apartment block"
+    ],
+    "ground_truth_titles": [
+      "Gym",
+      "Laundry",
+      "Clean apartment"
+    ],
+    "total_latency_ms": 14092.803600011393,
+    "total_tokens_input": 395,
+    "total_tokens_output": 385,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_02",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Coursework block",
+        "title": "Coursework block",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym block",
+        "title": "Gym block",
+        "start": "2026-08-10T09:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T09:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Clean apartment",
+      "Coursework block",
+      "Gym block"
+    ],
+    "ground_truth_titles": [
+      "Clean apartment",
+      "Coursework",
+      "Gym"
+    ],
+    "total_latency_ms": 9454.283600207418,
+    "total_tokens_input": 1831,
+    "total_tokens_output": 188,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_02",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "coursework",
+        "title": "coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "clean apartment",
+        "title": "clean apartment",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "gym",
+        "title": "gym",
+        "start": "2026-08-10T09:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:00:00",
+        "energy_required": "high",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:00:00",
+        "end": "2026-08-10T09:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T09:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "coursework",
+      "clean apartment",
+      "gym"
+    ],
+    "ground_truth_titles": [
+      "Clean apartment",
+      "Coursework",
+      "Gym"
+    ],
+    "total_latency_ms": 18610.320900101215,
+    "total_tokens_input": 394,
+    "total_tokens_output": 382,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_03",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T10:45:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T10:45:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "doctor's appointment",
+      "grocery shopping",
+      "write cover letter"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Doctor's appointment",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 34293.23470010422,
+    "total_tokens_input": 1855,
+    "total_tokens_output": 193,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_03",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T10:45:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T10:45:00",
+        "end": "2026-08-10T12:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "grocery shopping",
+      "doctor's appointment",
+      "write cover letter"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Doctor's appointment",
+      "Write cover letter"
+    ],
+    "total_latency_ms": 16538.281799992546,
+    "total_tokens_input": 410,
+    "total_tokens_output": 466,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_04",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "code review",
+        "title": "code review",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "code review",
+      "write cover letter",
+      "laundry"
+    ],
+    "ground_truth_titles": [
+      "Code review",
+      "Write cover letter",
+      "Laundry"
+    ],
+    "total_latency_ms": 19198.386300355196,
+    "total_tokens_input": 1830,
+    "total_tokens_output": 175,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_04",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "code review",
+        "title": "code review",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "write cover letter",
+        "title": "write cover letter",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Write cover letter",
+        "title": "Write cover letter",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "code review",
+      "write cover letter",
+      "laundry"
+    ],
+    "ground_truth_titles": [
+      "Code review",
+      "Write cover letter",
+      "Laundry"
+    ],
+    "total_latency_ms": 22207.824900047854,
+    "total_tokens_input": 400,
+    "total_tokens_output": 441,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_05",
+    "disruption_type": "urgent_task_injected",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor block",
+        "title": "Call with advisor block",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T11:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting block",
+        "title": "Team meeting block",
+        "start": "2026-08-10T11:00:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Call with advisor",
+      "Call with advisor block",
+      "Team meeting block"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Team meeting",
+      "Call with advisor"
+    ],
+    "total_latency_ms": 19798.056300263852,
+    "total_tokens_input": 1845,
+    "total_tokens_output": 177,
+    "error": null
+  },
+  {
+    "scenario_id": "urgent_task_injected_05",
+    "disruption_type": "urgent_task_injected",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "team meeting",
+        "title": "team meeting",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "call with advisor",
+        "title": "call with advisor",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Team meeting",
+        "title": "Team meeting",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "medium",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Call with advisor",
+        "title": "Call with advisor",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "medium",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "call with advisor",
+      "team meeting",
+      "call with advisor"
+    ],
+    "ground_truth_titles": [
+      "Call with advisor",
+      "Team meeting",
+      "Call with advisor"
+    ],
+    "total_latency_ms": 27150.815800065175,
+    "total_tokens_input": 405,
+    "total_tokens_output": 407,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_00",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Doctor's appointment",
+      "Read research paper",
+      "Grocery shopping"
+    ],
+    "ground_truth_titles": [
+      "Doctor's appointment",
+      "Read research paper",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 30540.637800004333,
+    "total_tokens_input": 1844,
+    "total_tokens_output": 186,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_00",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "doctor's appointment",
+        "title": "doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "read research paper",
+        "title": "read research paper",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Doctor's appointment",
+        "title": "Doctor's appointment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T09:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Read research paper",
+        "title": "Read research paper",
+        "start": "2026-08-10T09:30:00",
+        "end": "2026-08-10T11:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T11:30:00",
+        "end": "2026-08-10T13:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "doctor's appointment",
+      "read research paper",
+      "grocery shopping"
+    ],
+    "ground_truth_titles": [
+      "Doctor's appointment",
+      "Read research paper",
+      "Grocery shopping"
+    ],
+    "total_latency_ms": 38520.608900114894,
+    "total_tokens_input": 406,
+    "total_tokens_output": 417,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_01",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Grocery shopping",
+      "Code review",
+      "Clean apartment"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Code review",
+      "Clean apartment"
+    ],
+    "total_latency_ms": 14605.598599882796,
+    "total_tokens_input": 1828,
+    "total_tokens_output": 171,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_01",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "grocery shopping",
+        "title": "grocery shopping",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "code review",
+        "title": "code review",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "clean apartment",
+        "title": "clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Grocery shopping",
+        "title": "Grocery shopping",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Code review",
+        "title": "Code review",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T09:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T09:15:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "grocery shopping",
+      "code review",
+      "clean apartment"
+    ],
+    "ground_truth_titles": [
+      "Grocery shopping",
+      "Code review",
+      "Clean apartment"
+    ],
+    "total_latency_ms": 49861.26200016588,
+    "total_tokens_input": 399,
+    "total_tokens_output": 387,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_02",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "gym block",
+        "title": "gym block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "study session block",
+        "title": "study session block",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "interview prep block",
+        "title": "interview prep block",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "gym block",
+      "study session block",
+      "interview prep block"
+    ],
+    "ground_truth_titles": [
+      "Gym",
+      "Study session",
+      "Interview prep"
+    ],
+    "total_latency_ms": 17239.303700160235,
+    "total_tokens_input": 1834,
+    "total_tokens_output": 183,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_02",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "gym block",
+        "title": "gym block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "study session block",
+        "title": "study session block",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "interview prep block",
+        "title": "interview prep block",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "gym block",
+      "study session block",
+      "interview prep block"
+    ],
+    "ground_truth_titles": [
+      "Gym",
+      "Study session",
+      "Interview prep"
+    ],
+    "total_latency_ms": 33330.16770030372,
+    "total_tokens_input": 402,
+    "total_tokens_output": 394,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_03",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Clean apartment",
+      "Essay draft",
+      "Interview prep"
+    ],
+    "ground_truth_titles": [
+      "Clean apartment",
+      "Essay draft",
+      "Interview prep"
+    ],
+    "total_latency_ms": 17555.488100042567,
+    "total_tokens_input": 1832,
+    "total_tokens_output": 183,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_03",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "clean apartment",
+        "title": "clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "essay draft",
+        "title": "essay draft",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "interview prep",
+        "title": "interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Essay draft",
+        "title": "Essay draft",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Interview prep",
+        "title": "Interview prep",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T11:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "clean apartment",
+      "essay draft",
+      "interview prep"
+    ],
+    "ground_truth_titles": [
+      "Clean apartment",
+      "Essay draft",
+      "Interview prep"
+    ],
+    "total_latency_ms": 33469.692200189456,
+    "total_tokens_input": 403,
+    "total_tokens_output": 421,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_04",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework block",
+        "title": "Coursework block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment block",
+        "title": "Clean apartment block",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Study session block",
+        "title": "Study session block",
+        "start": "2026-08-10T10:15:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T10:15:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "Coursework block",
+      "Clean apartment block",
+      "Study session block"
+    ],
+    "ground_truth_titles": [
+      "Coursework",
+      "Clean apartment",
+      "Study session"
+    ],
+    "total_latency_ms": 1779.7596000600606,
+    "total_tokens_input": 1834,
+    "total_tokens_output": 197,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_04",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "coursework block",
+        "title": "coursework block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "clean apartment block",
+        "title": "clean apartment block",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "study session block",
+        "title": "study session block",
+        "start": "2026-08-10T10:15:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Coursework",
+        "title": "Coursework",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Clean apartment",
+        "title": "Clean apartment",
+        "start": "2026-08-10T08:45:00",
+        "end": "2026-08-10T10:15:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Study session",
+        "title": "Study session",
+        "start": "2026-08-10T10:15:00",
+        "end": "2026-08-10T10:45:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "coursework block",
+      "clean apartment block",
+      "study session block"
+    ],
+    "ground_truth_titles": [
+      "Coursework",
+      "Clean apartment",
+      "Study session"
+    ],
+    "total_latency_ms": 8594.790400238708,
+    "total_tokens_input": 401,
+    "total_tokens_output": 395,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_05",
+    "disruption_type": "energy_level_change",
+    "mode": "react",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "project presentation prep block",
+        "title": "project presentation prep block",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "laundry block",
+        "title": "laundry block",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T10:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "gym block",
+        "title": "gym block",
+        "start": "2026-08-10T10:30:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "project presentation prep block",
+      "laundry block",
+      "gym block"
+    ],
+    "ground_truth_titles": [
+      "Laundry",
+      "Gym",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 36760.551900137216,
+    "total_tokens_input": 1839,
+    "total_tokens_output": 182,
+    "error": null
+  },
+  {
+    "scenario_id": "energy_level_change_05",
+    "disruption_type": "energy_level_change",
+    "mode": "hierarchical",
+    "had_conflict_risk": false,
+    "produced_blocks": [
+      {
+        "id": null,
+        "task_id": "laundry",
+        "title": "laundry",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "gym",
+        "title": "gym",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "project presentation prep",
+        "title": "project presentation prep",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "ground_truth_blocks": [
+      {
+        "id": null,
+        "task_id": "Laundry",
+        "title": "Laundry",
+        "start": "2026-08-10T08:00:00",
+        "end": "2026-08-10T08:30:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Gym",
+        "title": "Gym",
+        "start": "2026-08-10T08:30:00",
+        "end": "2026-08-10T10:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      },
+      {
+        "id": null,
+        "task_id": "Project presentation prep",
+        "title": "Project presentation prep",
+        "start": "2026-08-10T10:00:00",
+        "end": "2026-08-10T12:00:00",
+        "energy_required": "low",
+        "status": "pending"
+      }
+    ],
+    "violations": [],
+    "extracted_titles": [
+      "laundry",
+      "gym",
+      "project presentation prep"
+    ],
+    "ground_truth_titles": [
+      "Laundry",
+      "Gym",
+      "Project presentation prep"
+    ],
+    "total_latency_ms": 2233.2396002020687,
+    "total_tokens_input": 399,
+    "total_tokens_output": 406,
+    "error": null
+  }
+]
